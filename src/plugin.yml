@@ -1,0 +1,6 @@
+name: ProceduralDungeon
+version: 1.0.0
+description: Generate some dungeon with random rooms
+authors: [Zarinoow]
+main: fr.foxelia.proceduraldungeon.Main
+depend: [WorldEdit]
