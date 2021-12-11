@@ -1,0 +1,3 @@
+messages:
+  errors:
+    invalidcmd: '&c[Error] Incomplete command! Try /help.'

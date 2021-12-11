@@ -4,3 +4,6 @@ description: Generate some dungeon with random rooms
 authors: [Zarinoow]
 main: fr.foxelia.proceduraldungeon.Main
 depend: [WorldEdit]
+commands:
+  dungeon:
+    description: Dungeon command.
