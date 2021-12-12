@@ -1,16 +1,21 @@
 package fr.foxelia.proceduraldungeon.utilities;
 
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.foxelia.proceduraldungeon.Main;
 
 public class DungeonConfig {
 	
-	private Main plugin = Main.getPlugin(Main.class);
+	private JavaPlugin plugin = Main.getProceduralDungeon();
 	
 	private FileConfiguration config;
 	private File configFile;
@@ -26,7 +31,21 @@ public class DungeonConfig {
 				configFile.getParentFile().mkdirs();
 			} catch (Exception e) {
 				Bukkit.getLogger().log(Level.SEVERE, "Cannot create dungeon folder for " + configFile.getName() + ".");
+				return;
 			}
+		}
+		if(!configFile.exists()) {
+			try {
+				InputStream inputStream = this.plugin.getResource("defaultdungeon.yml");
+				config = YamlConfiguration.loadConfiguration(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+				config.save(configFile);
+			} catch(Exception e) {
+				Bukkit.getLogger().log(Level.SEVERE, "Cannot generate default values for the " + configFile.getParentFile().getName() + " dungeon!");
+				e.printStackTrace();
+				return;
+			}
+		} else {
+			config = YamlConfiguration.loadConfiguration(configFile);
 		}	
 	}
 	

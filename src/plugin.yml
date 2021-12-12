@@ -7,3 +7,13 @@ depend: [WorldEdit]
 commands:
   dungeon:
     description: Dungeon command.
+permissions:
+  proceduraldungeon.admin.reload:
+    default: op
+  proceduraldungeon.admin.create:
+    default: op
+  proceduraldungeon.admin.addroom:
+    default: op
+  proceduraldungeon.admin.generate:
+    default: op
+    

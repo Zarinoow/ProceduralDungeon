@@ -1,3 +1,8 @@
 messages:
   errors:
+    internalerror: '&c[Error] Internal error! Please check the details in logs.'
     invalidcmd: '&c[Error] Incomplete command! Try /help.'
+    alreadyexist: '&c[Error] The dungeon %dungeon% already exists!' 
+  tasks:
+    timetook: '&aFinished! Took %time%ms.'
+    dungeoncreation: '&aStarting the creation of the dungeon...'

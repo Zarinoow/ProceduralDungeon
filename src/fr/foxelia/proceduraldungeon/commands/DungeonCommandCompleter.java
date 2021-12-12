@@ -6,13 +6,11 @@ import java.util.List;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.Player;
 
 public class DungeonCommandCompleter implements TabCompleter {
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String str, String[] args) {
-		if(!(sender instanceof Player)) return null;
 		ArrayList<String> suggest = new ArrayList<>();
 		
 		if(args.length == 1) {
