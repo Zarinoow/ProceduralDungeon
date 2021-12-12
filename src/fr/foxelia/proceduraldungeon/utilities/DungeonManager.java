@@ -26,12 +26,18 @@ public class DungeonManager {
 		this.dungeonConfiguration = new DungeonConfig(dungeonFolder.getName());
 		if(getConfig() == null) throw new NullPointerException("An error occurred while generating the configuration file!");
 		getConfig().set("name", dungeonName);
+		getDungeonConfig().saveConfig();
 		Main.getDungeons().put(dungeonName.toLowerCase(), this);
+		Main.saveDungeons();
 	}
 	
-	public boolean restoreDungeon() {
-		
-		return false;
+	public void restoreDungeon() {
+		if(!dungeonFolder.exists())	throw new NullPointerException("The dungeon " + dungeonFolder + " doesn't exists!");
+		this.dungeonConfiguration = new DungeonConfig(dungeonFolder.getName());
+		if(this.dungeonConfiguration == null) throw new NullPointerException("The configuration of the dungeon " + dungeonFolder.getName() + " doesn't exists!");
+		if(this.dungeonConfiguration.getConfig().get("name") == null) throw new NullPointerException("The config is incomplete!");
+		this.dungeonName = dungeonConfiguration.getConfig().getString("name");
+		Main.getDungeons().put(this.dungeonName.toLowerCase(), this);
 	}
 	
 	/*
@@ -59,7 +65,9 @@ public class DungeonManager {
 	 */
 	
 	public boolean exist() {
-		if(Main.getDungeons().containsKey(dungeonName.toLowerCase())) return true;
+		for(DungeonManager dm : Main.getDungeons().values()) {
+			if(dm.getDungeonFolder().getName().equals(this.getDungeonFolder().getName())) return true;
+		}
 		return false;
 	}
 }

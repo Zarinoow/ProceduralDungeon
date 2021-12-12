@@ -1,6 +1,7 @@
 package fr.foxelia.proceduraldungeon.utilities;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -51,6 +52,15 @@ public class DungeonConfig {
 	
 	public FileConfiguration getConfig() {
 		return config;
+	}
+	
+	public void saveConfig() {
+		if(config != null && configFile != null)
+			try {
+				config.save(configFile);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 	}
 
 }

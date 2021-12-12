@@ -17,6 +17,7 @@ public class DungeonCommandCompleter implements TabCompleter {
 			// /dungeon
 			if(sender.hasPermission("proceduraldungeon.admin.reload")) suggest.add("reload");
 			if(sender.hasPermission("proceduraldungeon.admin.create")) suggest.add("create");
+			if(sender.hasPermission("proceduraldungeon.admin.edit")) suggest.add("edit");
 			if(sender.hasPermission("proceduraldungeon.admin.addroom")) suggest.add("addroom");
 			if(sender.hasPermission("proceduraldungeon.admin.generate")) suggest.add("generate");
 		}
