@@ -20,7 +20,8 @@ public class DungeonManager {
 	
 	public void createDungeon(String dungeonName) throws InstanceAlreadyExistsException, NullPointerException {
 		this.dungeonName = dungeonName;
-		if(this.exist()) throw new InstanceAlreadyExistsException("An instance of this dungeon (" + Main.getDungeons().get(dungeonFolder.getName()).getName() + ") already exists!");
+		DungeonManager checker = this.checkExists();
+		if(checker != null) throw new InstanceAlreadyExistsException("An instance of " + checker.getName() + " dungeon already exists! Folder: " + checker.getDungeonFolder().getName());
 		if(dungeonFolder == null) return;
 		if(!dungeonFolder.exists()) dungeonFolder.mkdirs();
 		this.dungeonConfiguration = new DungeonConfig(dungeonFolder.getName());
@@ -37,7 +38,6 @@ public class DungeonManager {
 		if(this.dungeonConfiguration == null) throw new NullPointerException("The configuration of the dungeon " + dungeonFolder.getName() + " doesn't exists!");
 		if(this.dungeonConfiguration.getConfig().get("name") == null) throw new NullPointerException("The config is incomplete!");
 		this.dungeonName = dungeonConfiguration.getConfig().getString("name");
-		Main.getDungeons().put(this.dungeonName.toLowerCase(), this);
 	}
 	
 	/*
@@ -58,6 +58,13 @@ public class DungeonManager {
 	
 	public String getName() {
 		return dungeonName;
+	}
+	
+	public DungeonManager checkExists() {
+		for(DungeonManager dm : Main.getDungeons().values()) {
+			if(dm.getDungeonFolder().getName().equals(this.getDungeonFolder().getName())) return dm;
+		}
+		return null;
 	}
 	
 	/*

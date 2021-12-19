@@ -16,8 +16,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.foxelia.proceduraldungeon.commands.DungeonCommand;
 import fr.foxelia.proceduraldungeon.commands.DungeonCommandCompleter;
+import fr.foxelia.proceduraldungeon.utilities.ActionType;
 import fr.foxelia.proceduraldungeon.utilities.DungeonManager;
 import net.md_5.bungee.api.ChatColor;
+import oshi.util.tuples.Pair;
 
 public class Main extends JavaPlugin {
 	
@@ -32,7 +34,8 @@ public class Main extends JavaPlugin {
 	 */
 	private static Main mainclass;
 	
-	private static Map<String, DungeonManager> dungeons = new HashMap<>(); 
+	private static Map<String, DungeonManager> dungeons = new HashMap<>();
+	private static Map<CommandSender, Pair<ActionType, String>> confirmation = new HashMap<>();
 	
 	@Override
 	public void onEnable() {
@@ -79,22 +82,29 @@ public class Main extends JavaPlugin {
 		if(!memoryFile.exists()) return;
 		getLogger().log(Level.INFO, ChatColor.GREEN + "Restoring the dungeons sessions...");
 		Long delay = System.currentTimeMillis();
-		
+
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(memoryFile)));
 			String line = reader.readLine();
 			
 			while(line != null) {
 				DungeonManager dm = new DungeonManager(line);
-				dm.restoreDungeon();
+				if(dm.getDungeonFolder().exists()) {
+					dm.restoreDungeon();
+					if(Main.getDungeons().containsKey(dm.getName().toLowerCase())) {
+						getLogger().log(Level.WARNING, "Cannot load " + line + " dungeon folder! Another instance with the same name is already running. This dungeon will be automagically removed from the config.");
+					} else Main.getDungeons().put(dm.getName().toLowerCase(), dm);
+				} else getLogger().log(Level.WARNING, "The dungeon folder " + line + " doesn't exists! This dungeon will be automagically removed from the config.");
 				line = reader.readLine();
 			}
 			
 			reader.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-			return;
+		} catch (NullPointerException e) {
+			e.printStackTrace();
 		}
+		Main.saveDungeons();
 		getLogger().log(Level.INFO, ChatColor.GREEN + "Dungeons restored! Took " + String.valueOf(System.currentTimeMillis() - delay) + "ms.");
 	}
 	
@@ -145,11 +155,26 @@ public class Main extends JavaPlugin {
 		return dungeons;
 	}
 	
+	public static Map<CommandSender, Pair<ActionType, String>> getConfirmation() {
+		return confirmation;
+	}
+	
+	/*
+	 * Config getters
+	 */
 	public static String getErrorMessage(String message) {
 		return getMain().getConfig().getString("messages.errors." + message);
 	}
 	
+	public static String getSuccessMessage(String message) {
+		return getMain().getConfig().getString("messages.success." + message);
+	}
+	
 	public static String getTaskMessage(String message) {
 		return getMain().getConfig().getString("messages.tasks." + message);
+	}
+	
+	public static String getOthersMessage(String message) {
+		return getMain().getConfig().getString("messages.others." + message);
 	}
 }

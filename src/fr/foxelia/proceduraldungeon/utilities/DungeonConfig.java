@@ -39,6 +39,7 @@ public class DungeonConfig {
 			try {
 				InputStream inputStream = this.plugin.getResource("defaultdungeon.yml");
 				config = YamlConfiguration.loadConfiguration(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+				config.set("name", "dungeon-" + System.currentTimeMillis());
 				config.save(configFile);
 			} catch(Exception e) {
 				Bukkit.getLogger().log(Level.SEVERE, "Cannot generate default values for the " + configFile.getParentFile().getName() + " dungeon!");
