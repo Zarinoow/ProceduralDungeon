@@ -29,7 +29,6 @@ public class Main extends JavaPlugin {
 	 * % chance d'une salle
 	 * Générée le donjon
 	 * Crée une room
-	 * Reload la config
 	 * 
 	 */
 	private static Main mainclass;

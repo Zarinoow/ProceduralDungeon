@@ -63,5 +63,9 @@ public class DungeonConfig {
 				e.printStackTrace();
 			}
 	}
+	
+	public void reloadConfig() {
+		if(configFile.exists()) config = YamlConfiguration.loadConfiguration(configFile);
+	}
 
 }

@@ -3,6 +3,7 @@ package fr.foxelia.proceduraldungeon.commands;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 
 import javax.management.InstanceAlreadyExistsException;
 
@@ -28,6 +29,19 @@ public class DungeonCommand implements CommandExecutor {
  */
 			if(args[0].equalsIgnoreCase("reload") && sender.hasPermission("proceduraldungeon.admin.reload")) {
 				Main.getMain().reloadConfig();
+				List<DungeonManager> dms = List.copyOf(Main.getDungeons().values());
+				Main.getDungeons().clear();
+				for(DungeonManager dm : dms) {
+					if(dm.getDungeonFolder().exists()) {
+						dm.getDungeonConfig().reloadConfig();
+						dm.restoreDungeon();
+						if(Main.getDungeons().containsKey(dm.getName().toLowerCase())) {
+							sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("duplicatename").replace("%folder%", dm.getDungeonFolder().getName())));
+						} else Main.getDungeons().put(dm.getName().toLowerCase(), dm);						
+					}
+				}
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getOthersMessage("reload")));
+				return true;
 /*
  * Create Command
  */
