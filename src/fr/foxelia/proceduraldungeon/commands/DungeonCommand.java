@@ -8,13 +8,26 @@ import java.util.List;
 import javax.management.InstanceAlreadyExistsException;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Region;
 
 import fr.foxelia.proceduraldungeon.Main;
 import fr.foxelia.proceduraldungeon.utilities.ActionType;
 import fr.foxelia.proceduraldungeon.utilities.DungeonManager;
+import fr.foxelia.proceduraldungeon.utilities.WorldEditSchematic;
+import fr.foxelia.proceduraldungeon.utilities.rooms.Coordinate;
+import fr.foxelia.proceduraldungeon.utilities.rooms.Room;
 import net.md_5.bungee.api.ChatColor;
 import oshi.util.tuples.Pair;
 
@@ -196,9 +209,98 @@ public class DungeonCommand implements CommandExecutor {
 					return true;
 				}
 /*
+ * AddRoom
+ */
+			} else if(args[0].equalsIgnoreCase("addroom") && sender.hasPermission("proceduraldungeon.admin.addroom")) {
+				if(!(sender instanceof Player)) {
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("noconsole")));
+					return false;					
+				}
+				
+				if(args.length >= 2) {
+					Player p = (Player) sender;
+					
+					if(!Main.getDungeons().containsKey(args[1].toLowerCase())) {
+						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("doesnotexist").replace("%dungeon%", args[1])));
+						return false;
+					}
+					
+					Region pr;
+					try {
+						pr = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(p)).getSelection();
+					} catch (IncompleteRegionException e) {
+						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("invalidregion")));
+						return false;
+					}
+					
+					if(!Main.getExitLocation().containsKey(p)) {
+						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("exitnotset")));
+						return false;
+					} else if(!isInNorthFace(pr, Main.getExitLocation().get(p))) {
+						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("exitincorectregion")));
+						return false;
+					} else if(!isInSouthFace(pr, p.getLocation().getBlock().getLocation())) {
+						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("originincorectlocation")
+								.replace("%z%", String.valueOf(Math.max(pr.getMinimumPoint().getBlockZ(), pr.getMaximumPoint().getBlockZ())))));
+						return false;
+					}	
+					
+					DungeonManager dungeon = Main.getDungeons().get(args[1].toLowerCase());
+					if(dungeon.getDungeonRooms() == null) {
+						Main.sendInternalError(sender);
+						throw new NullPointerException("Room manager cannot be null");
+					}
+					WorldEditSchematic schematic = new WorldEditSchematic();
+					File roomFile = new File(dungeon.getDungeonRooms().getFolder(), "room_" + dungeon.getDungeonRooms().getFolder().length() + ".dungeon");
+					schematic.saveSchematic(p.getLocation().getBlock().getLocation(), WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(p)), roomFile);
+					if(schematic.getSaveException() != null) {
+						Main.sendInternalError(sender);
+						schematic.getSaveException().printStackTrace();
+						return false;
+					}
+					
+					Coordinate coord = generateCoordinate(pr, Main.getExitLocation().get(p));
+					Room dungeonRoom = new Room(roomFile, coord);
+					dungeon.getDungeonRooms().addRoom(dungeonRoom);
+					
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getSuccessMessage("roomadded").replace("%dungeon%", dungeon.getName())));
+					return true;
+				}
+// Set Exit
+			} else if(args[0].equalsIgnoreCase("setexit") && sender.hasPermission("proceduraldungeon.admin.addroom")) {
+				if(!(sender instanceof Player)) {
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("noconsole")));
+					return false;					
+				}
+				
+				Player p = (Player) sender;
+				
+				Region pr;
+				try {
+					pr = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(p)).getSelection();
+				} catch (IncompleteRegionException e) {
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("invalidregion")));
+					return false;
+				}
+				
+				if(!isInNorthFace(pr, p.getLocation().getBlock().getLocation())) {
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("exitincorectlocation")
+							.replace("%z%", String.valueOf(Math.min(pr.getMinimumPoint().getBlockZ(), pr.getMaximumPoint().getBlockZ())))));
+					return false;
+				} else {
+					Main.getExitLocation().put(p, p.getLocation().getBlock().getLocation());
+					p.getWorld().spawnEntity(p.getLocation().getBlock().getLocation().add(0.5, 0, 0.5), EntityType.FIREWORK);
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getSuccessMessage("exitset")
+							.replace("%x%", String.valueOf(p.getLocation().getBlockX()))
+							.replace("%y%", String.valueOf(p.getLocation().getBlockY()))
+							.replace("%z%", String.valueOf(p.getLocation().getBlockZ()))
+							));
+					return true;
+				}
+			}
+/*
  * End
  */
-			}
 		}
 		
 		sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("invalidcmd")));
@@ -210,5 +312,40 @@ public class DungeonCommand implements CommandExecutor {
 			for(File subfiles : file.listFiles()) delete(subfiles);
 		}
 		if(!file.delete()) throw new FileNotFoundException("Failed to delete file: " + file);
+	}
+	
+	private boolean isInNorthFace(Region selection, Location loc) {		
+		BlockVector3 pos = BlockVector3.at(loc.getX(), loc.getY(), loc.getZ());
+		
+		double zcoord = Math.min(selection.getMinimumPoint().getBlockZ(), selection.getMaximumPoint().getBlockZ());
+		Region area = new CuboidRegion(
+				BlockVector3.at(selection.getMinimumPoint().getBlockX(), selection.getMinimumPoint().getBlockY(), zcoord), 
+				BlockVector3.at(selection.getMaximumPoint().getBlockX(), selection.getMaximumPoint().getBlockY(), zcoord));
+		
+		if(area.contains(pos)) {
+			return true;
+		} else return false;
+	}
+	
+	private boolean isInSouthFace(Region selection, Location loc) {		
+		BlockVector3 pos = BlockVector3.at(loc.getX(), loc.getY(), loc.getZ());
+		
+		double zcoord = Math.max(selection.getMinimumPoint().getBlockZ(), selection.getMaximumPoint().getBlockZ());
+		Region area = new CuboidRegion(
+				BlockVector3.at(selection.getMinimumPoint().getBlockX(), selection.getMinimumPoint().getBlockY(), zcoord), 
+				BlockVector3.at(selection.getMaximumPoint().getBlockX(), selection.getMaximumPoint().getBlockY(), zcoord));
+		
+		if(area.contains(pos)) {
+			return true;
+		} else return false;
+	}
+	
+	private Coordinate generateCoordinate(Region selection, Location origin) {
+		
+		double maxX = Math.max(selection.getMinimumPoint().getBlockX(), selection.getMaximumPoint().getBlockX());
+		double maxY = Math.max(selection.getMinimumPoint().getBlockY(), selection.getMaximumPoint().getBlockY());
+		double maxZ = Math.max(selection.getMinimumPoint().getBlockZ(), selection.getMaximumPoint().getBlockZ());
+		
+		return new Coordinate(maxX - origin.getBlockX(), maxY - origin.getBlockY(), maxZ - origin.getBlockZ());
 	}
 }

@@ -11,7 +11,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.foxelia.proceduraldungeon.commands.DungeonCommand;
@@ -35,6 +37,7 @@ public class Main extends JavaPlugin {
 	
 	private static Map<String, DungeonManager> dungeons = new HashMap<>();
 	private static Map<CommandSender, Pair<ActionType, String>> confirmation = new HashMap<>();
+	private static Map<Player, Location> exitLocation = new HashMap<>();
 	
 	@Override
 	public void onEnable() {
@@ -156,6 +159,10 @@ public class Main extends JavaPlugin {
 	
 	public static Map<CommandSender, Pair<ActionType, String>> getConfirmation() {
 		return confirmation;
+	}
+	
+	public static Map<Player, Location> getExitLocation() {
+		return exitLocation;
 	}
 	
 	/*

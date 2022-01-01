@@ -7,11 +7,13 @@ import javax.management.InstanceAlreadyExistsException;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import fr.foxelia.proceduraldungeon.Main;
+import fr.foxelia.proceduraldungeon.utilities.rooms.RoomsManager;
 
 public class DungeonManager {
 	
 	private String dungeonName;
 	private File dungeonFolder;
+	private RoomsManager dungeonRooms;
 	private DungeonConfig dungeonConfiguration;
 	
 	public DungeonManager(String folder) {
@@ -28,6 +30,7 @@ public class DungeonManager {
 		if(getConfig() == null) throw new NullPointerException("An error occurred while generating the configuration file!");
 		getConfig().set("name", dungeonName);
 		getDungeonConfig().saveConfig();
+		this.dungeonRooms = new RoomsManager(dungeonFolder);
 		Main.getDungeons().put(dungeonName.toLowerCase(), this);
 		Main.saveDungeons();
 	}
@@ -38,6 +41,7 @@ public class DungeonManager {
 		if(this.dungeonConfiguration == null) throw new NullPointerException("The configuration of the dungeon " + dungeonFolder.getName() + " doesn't exists!");
 		if(this.dungeonConfiguration.getConfig().get("name") == null) throw new NullPointerException("The config is invalid!");
 		this.dungeonName = dungeonConfiguration.getConfig().getString("name");
+		this.dungeonRooms = new RoomsManager(dungeonFolder);
 	}
 	
 	/*
@@ -58,6 +62,10 @@ public class DungeonManager {
 	
 	public String getName() {
 		return dungeonName;
+	}
+	
+	public RoomsManager getDungeonRooms() {
+		return dungeonRooms;
 	}
 	
 	public DungeonManager checkExists() {

@@ -6,6 +6,7 @@ import java.util.List;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
 
 import fr.foxelia.proceduraldungeon.Main;
 import fr.foxelia.proceduraldungeon.utilities.DungeonManager;
@@ -22,9 +23,13 @@ public class DungeonCommandCompleter implements TabCompleter {
 			if(sender.hasPermission("proceduraldungeon.admin.create")) suggest.add("create");
 			if(sender.hasPermission("proceduraldungeon.admin.remove")) suggest.add("remove");
 			if(sender.hasPermission("proceduraldungeon.admin.delete")) suggest.add("delete");
-			if(sender.hasPermission("proceduraldungeon.admin.edit")) suggest.add("edit");
-			if(sender.hasPermission("proceduraldungeon.admin.addroom")) suggest.add("addroom");
-			if(sender.hasPermission("proceduraldungeon.admin.generate")) suggest.add("generate");
+			if(sender.hasPermission("proceduraldungeon.admin.edit")) suggest.add("edit"); // Not coded
+			if(sender.hasPermission("proceduraldungeon.admin.addroom") && sender instanceof Player) {
+				suggest.add("addroom");
+				suggest.add("setexit");
+			}
+			if(sender.hasPermission("proceduraldungeon.admin.generate")) suggest.add("generate"); // Not coded
+			if(sender.hasPermission("proceduraldungeon.admin.list")) suggest.add("list"); // Not coded
 			if(Main.getConfirmation().containsKey(sender)) suggest.add("confirm");
 		} else if(args.length == 2) {
 			// /dungeon remove
@@ -34,6 +39,10 @@ public class DungeonCommandCompleter implements TabCompleter {
 				}
 			// /dungeon delete
 			} else if(sender.hasPermission("proceduraldungeon.admin.delete") && args[0].equalsIgnoreCase("delete")) {
+				for(DungeonManager dm : Main.getDungeons().values()) {
+					suggest.add(dm.getName());
+				}
+			} else if(sender.hasPermission("proceduraldungeon.admin.addroom") && args[0].equalsIgnoreCase("addroom") && sender instanceof Player) {
 				for(DungeonManager dm : Main.getDungeons().values()) {
 					suggest.add(dm.getName());
 				}
