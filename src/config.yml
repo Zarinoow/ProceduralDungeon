@@ -27,3 +27,8 @@ messages:
     deletedungeon: '&cWarning, this command is intended to permanently delete the &4%dungeon%&c dungeon, this action cannot be undone. Please confirm your operation with the command &4/dungeon confirm&c.'
     importdungeon: '&aA record of this dungeon appears to already exist. Would you want try to import it? Please confirm your operation with the command &b/dungeon confirm&a.'
     reload: '&aDungeons configs and messages reloaded!'
+  gui:
+    dungeongui:
+      title: "%dungeon%"
+    roomgui:
+      title: "%room%"

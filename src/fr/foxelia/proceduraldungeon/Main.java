@@ -7,7 +7,9 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -18,6 +20,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.foxelia.proceduraldungeon.commands.DungeonCommand;
 import fr.foxelia.proceduraldungeon.commands.DungeonCommandCompleter;
+import fr.foxelia.proceduraldungeon.gui.GUI;
 import fr.foxelia.proceduraldungeon.utilities.ActionType;
 import fr.foxelia.proceduraldungeon.utilities.DungeonManager;
 import net.md_5.bungee.api.ChatColor;
@@ -38,6 +41,7 @@ public class Main extends JavaPlugin {
 	private static Map<String, DungeonManager> dungeons = new HashMap<>();
 	private static Map<CommandSender, Pair<ActionType, String>> confirmation = new HashMap<>();
 	private static Map<Player, Location> exitLocation = new HashMap<>();
+	private static List<GUI> guis = new ArrayList<GUI>();
 	
 	@Override
 	public void onEnable() {
@@ -165,6 +169,10 @@ public class Main extends JavaPlugin {
 		return exitLocation;
 	}
 	
+	public static List<GUI> getGUIs() {
+		return guis;
+	}
+	
 	/*
 	 * Config getters
 	 */
@@ -182,5 +190,13 @@ public class Main extends JavaPlugin {
 	
 	public static String getOthersMessage(String message) {
 		return getMain().getConfig().getString("messages.others." + message);
+	}
+	
+	public static String getGUIString(String string) {
+		return getMain().getConfig().getString("gui." + string);		
+	}
+	
+	public static List<String> getGuiStringList(String list) {
+		return getMain().getConfig().getStringList("gui." + list);
 	}
 }
