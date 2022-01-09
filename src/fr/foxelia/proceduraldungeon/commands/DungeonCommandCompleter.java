@@ -23,7 +23,7 @@ public class DungeonCommandCompleter implements TabCompleter {
 			if(sender.hasPermission("proceduraldungeon.admin.create")) suggest.add("create");
 			if(sender.hasPermission("proceduraldungeon.admin.remove")) suggest.add("remove");
 			if(sender.hasPermission("proceduraldungeon.admin.delete")) suggest.add("delete");
-			if(sender.hasPermission("proceduraldungeon.admin.edit")) suggest.add("edit"); // Not coded
+			if(sender.hasPermission("proceduraldungeon.admin.edit")) suggest.add("edit"); // Work In Progress
 			if(sender.hasPermission("proceduraldungeon.admin.addroom") && sender instanceof Player) {
 				suggest.add("addroom");
 				suggest.add("setexit");
@@ -32,23 +32,27 @@ public class DungeonCommandCompleter implements TabCompleter {
 			if(sender.hasPermission("proceduraldungeon.admin.list")) suggest.add("list"); // Not coded
 			if(Main.getConfirmation().containsKey(sender)) suggest.add("confirm");
 		} else if(args.length == 2) {
-			// /dungeon remove
+// /dungeon remove
 			if(sender.hasPermission("proceduraldungeon.admin.remove") && args[0].equalsIgnoreCase("remove")) {
 				for(DungeonManager dm : Main.getDungeons().values()) {
 					suggest.add(dm.getName());
 				}
-			// /dungeon delete
+// /dungeon delete
 			} else if(sender.hasPermission("proceduraldungeon.admin.delete") && args[0].equalsIgnoreCase("delete")) {
 				for(DungeonManager dm : Main.getDungeons().values()) {
 					suggest.add(dm.getName());
 				}
+// /dungeon addroom
 			} else if(sender.hasPermission("proceduraldungeon.admin.addroom") && args[0].equalsIgnoreCase("addroom") && sender instanceof Player) {
 				for(DungeonManager dm : Main.getDungeons().values()) {
 					suggest.add(dm.getName());
 				}
+// /dungeon edit
+			} else if(sender.hasPermission("proceduraldungeon.admin.edit") && args[0].equalsIgnoreCase("edit") && sender instanceof Player) {
+				for(DungeonManager dm : Main.getDungeons().values()) {
+					suggest.add(dm.getName());
+				}
 			}
-			
-			
 		}
 		
 		return suggest;

@@ -23,6 +23,9 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 
 import fr.foxelia.proceduraldungeon.Main;
+import fr.foxelia.proceduraldungeon.gui.GUI;
+import fr.foxelia.proceduraldungeon.gui.GUIManager;
+import fr.foxelia.proceduraldungeon.gui.GUIType;
 import fr.foxelia.proceduraldungeon.utilities.ActionType;
 import fr.foxelia.proceduraldungeon.utilities.DungeonManager;
 import fr.foxelia.proceduraldungeon.utilities.WorldEditSchematic;
@@ -295,6 +298,35 @@ public class DungeonCommand implements CommandExecutor {
 							.replace("%y%", String.valueOf(p.getLocation().getBlockY()))
 							.replace("%z%", String.valueOf(p.getLocation().getBlockZ()))
 							));
+					return true;
+				}
+// Edit
+			} else if(args[0].equalsIgnoreCase("edit") && sender.hasPermission("proceduraldungeon.admin.edit")) {
+				if(!(sender instanceof Player)) {
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("noconsole")));
+					return false;					
+				}
+				
+				if(args.length >= 2) {
+					Player p = (Player) sender;
+					
+					if(!Main.getDungeons().containsKey(args[1].toLowerCase())) {
+						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("doesnotexist").replace("%dungeon%", args[1])));
+						return false;
+					}
+					
+					DungeonManager dungeon = Main.getDungeons().get(args[1].toLowerCase());
+					
+					for(GUI gui : Main.getGUIs()) {
+						if(gui.getDungeon().equals(dungeon) && gui.getType().equals(GUIType.DUNGEON)) {
+							p.openInventory(gui.getInventory());
+							return true;
+						}
+					}
+					
+					GUI gui = new GUIManager().createDungeonGUI(dungeon);
+					Main.getGUIs().add(gui);
+					p.openInventory(gui.getInventory());
 					return true;
 				}
 			}

@@ -21,6 +21,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import fr.foxelia.proceduraldungeon.commands.DungeonCommand;
 import fr.foxelia.proceduraldungeon.commands.DungeonCommandCompleter;
 import fr.foxelia.proceduraldungeon.gui.GUI;
+import fr.foxelia.proceduraldungeon.gui.GUIListeners;
 import fr.foxelia.proceduraldungeon.utilities.ActionType;
 import fr.foxelia.proceduraldungeon.utilities.DungeonManager;
 import net.md_5.bungee.api.ChatColor;
@@ -75,6 +76,7 @@ public class Main extends JavaPlugin {
 		
 		getCommand("dungeon").setExecutor(new DungeonCommand());
 		getCommand("dungeon").setTabCompleter(new DungeonCommandCompleter());
+		getServer().getPluginManager().registerEvents(new GUIListeners(), this);
 		
 	}
 	

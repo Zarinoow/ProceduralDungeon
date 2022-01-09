@@ -1,4 +1,5 @@
 # Do not edit the config-version
 config-version: 1.0
 name: dungeonname
-
+roomcount: 5
+roomrecyling: false

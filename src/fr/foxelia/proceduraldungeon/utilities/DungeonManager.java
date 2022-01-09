@@ -76,6 +76,16 @@ public class DungeonManager {
 	}
 	
 	/*
+	 * Setters
+	 */
+	
+	public void setName(String newName) {
+		this.dungeonName = newName;
+		getConfig().set("name", newName);
+		getDungeonConfig().saveConfig();
+	}
+	
+	/*
 	 * Conditionals
 	 */
 	
