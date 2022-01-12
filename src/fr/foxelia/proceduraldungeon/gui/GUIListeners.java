@@ -1,17 +1,22 @@
 package fr.foxelia.proceduraldungeon.gui;
 
+import java.util.ArrayList;
 import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.PrepareAnvilEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.foxelia.proceduraldungeon.Main;
+import fr.foxelia.proceduraldungeon.utilities.DungeonManager;
 import net.md_5.bungee.api.ChatColor;
 
 public class GUIListeners implements Listener {
@@ -32,10 +37,26 @@ public class GUIListeners implements Listener {
 			switch(e.getSlot()) {
 			case 2:
 				if(e.isLeftClick()) {
+					DungeonManager dungeon = gui.getDungeon();
+					Main.getRenaming().put(e.getWhoClicked(), dungeon);
+					e.getWhoClicked().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getOthersMessage("renaming")));
 					e.getWhoClicked().closeInventory();
-					GUI renamegui = new GUIManager().createRenamingGUI(gui.getDungeon());
-					Main.getGUIs().add(renamegui);
-					e.getWhoClicked().openInventory(renamegui.getInventory());
+					Bukkit.getScheduler().runTaskLater(Main.getProceduralDungeon(), () -> {
+						if(Main.getRenaming().containsKey(e.getWhoClicked())) {
+							Main.getRenaming().remove(e.getWhoClicked());
+							
+							for(GUI igui : Main.getGUIs()) {
+								if(igui.getDungeon().equals(dungeon) && igui.getType().equals(GUIType.DUNGEON)) {
+									e.getWhoClicked().openInventory(igui.getInventory());
+									return;
+								}
+							}
+							
+							GUI igui = new GUIManager().createDungeonGUI(dungeon);
+							Main.getGUIs().add(igui);
+							e.getWhoClicked().openInventory(igui.getInventory());
+						}
+					}, 200);
 				}
 				break;
 			case 4:
@@ -124,9 +145,10 @@ public class GUIListeners implements Listener {
 		} else if(gui.getType().equals(GUIType.RENAMING)) {
 			switch (e.getSlot()) {
 			case 2:
+				System.out.println(((AnvilInventory) gui.getInventory()).getRenameText()); // Debug
 				break;
 			default:
-				e.setCancelled(true);
+//				e.setCancelled(true);
 				break;
 			}
 		}
@@ -134,51 +156,47 @@ public class GUIListeners implements Listener {
 	}
 	
 	@EventHandler
-	public void onDungeonRename(PrepareAnvilEvent e) {
-		GUI gui = null;
-		for(GUI igui : Main.getGUIs()) {
-			if(igui.getInventory().equals(e.getInventory())) {
-				gui = igui;
-				break;
-			}
+	public void onDungeonRename(AsyncPlayerChatEvent e) {
+		if(!Main.getRenaming().containsKey(e.getPlayer())) return;
+		DungeonManager dungeon = Main.getRenaming().get(e.getPlayer());
+		e.setCancelled(true);
+		
+		String newName = e.getMessage().split(" ")[0];
+		if(Main.getDungeons().containsKey(newName.toLowerCase())) {
+			e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("alreadyexist")
+					.replace("%dungeon%", Main.getDungeons().get(newName.toLowerCase()).getName())));
+			return;
 		}
-		if(gui == null) return;
 		
-		Main.getGUIs().remove(gui);
-		
-		if(e.getResult() != null) {
-			String newname = e.getResult().getItemMeta().getDisplayName();
-			e.setResult(null);
-			if(Main.getDungeons().containsKey(newname.toLowerCase())) {
-				for(HumanEntity p : e.getViewers()) {
-					p.closeInventory();
-					p.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("alreadyexist")
-							.replace("%dungeon%", Main.getDungeons().get(newname.toLowerCase()).getName())));
+		Main.getRenaming().remove(e.getPlayer());
+
+		BukkitRunnable run = new BukkitRunnable() {
+			@Override
+			public void run() {
+				Main.getDungeons().remove(dungeon.getName().toLowerCase());
+				dungeon.setName(newName);
+				Main.getDungeons().put(dungeon.getName().toLowerCase(), dungeon);
+
+				GUI newgui = new GUIManager().createDungeonGUI(dungeon);
+				GUI removegui = null;
+				
+				for(GUI opengui : Main.getGUIs()) {
+					if(opengui.getDungeon().equals(dungeon) && opengui.getType().equals(GUIType.DUNGEON)) {
+						for(HumanEntity p : new ArrayList<>(opengui.getInventory().getViewers())) {
+							p.openInventory(newgui.getInventory());
+						}
+						removegui = opengui;
+					}
 				}
-				return;
+				
+				if(removegui != null) Main.getGUIs().remove(removegui);
+				Main.getGUIs().add(newgui);
+				
+				e.getPlayer().openInventory(newgui.getInventory());			
 			}
-			Main.getDungeons().remove(gui.getDungeon().getName().toLowerCase());
-			gui.getDungeon().setName(newname);
-			Main.getDungeons().put(gui.getDungeon().getName().toLowerCase(), gui.getDungeon());
-		}
+		};
 		
-		GUI newgui = new GUIManager().createDungeonGUI(gui.getDungeon());
-		
-		for(GUI opengui : Main.getGUIs()) {
-			if(opengui.getDungeon().equals(gui.getDungeon()) && opengui.getType().equals(GUIType.DUNGEON)) {
-				for(HumanEntity p : opengui.getInventory().getViewers()) {
-					p.openInventory(newgui.getInventory());
-				}
-				Main.getGUIs().remove(opengui);
-				return;
-			}
-		}
-		
-		Main.getGUIs().add(newgui);
-		for(HumanEntity p : e.getViewers()) {
-			p.openInventory(newgui.getInventory());
-		}
-		
+		run.runTask(Main.getProceduralDungeon());
 	}
 	
 	

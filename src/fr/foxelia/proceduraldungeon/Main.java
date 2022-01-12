@@ -15,6 +15,7 @@ import java.util.logging.Level;
 
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -24,8 +25,8 @@ import fr.foxelia.proceduraldungeon.gui.GUI;
 import fr.foxelia.proceduraldungeon.gui.GUIListeners;
 import fr.foxelia.proceduraldungeon.utilities.ActionType;
 import fr.foxelia.proceduraldungeon.utilities.DungeonManager;
+import fr.foxelia.proceduraldungeon.utilities.Pair;
 import net.md_5.bungee.api.ChatColor;
-import oshi.util.tuples.Pair;
 
 public class Main extends JavaPlugin {
 	
@@ -41,6 +42,7 @@ public class Main extends JavaPlugin {
 	
 	private static Map<String, DungeonManager> dungeons = new HashMap<>();
 	private static Map<CommandSender, Pair<ActionType, String>> confirmation = new HashMap<>();
+	private static Map<HumanEntity, DungeonManager> renaming = new HashMap<>();
 	private static Map<Player, Location> exitLocation = new HashMap<>();
 	private static List<GUI> guis = new ArrayList<GUI>();
 	
@@ -165,6 +167,10 @@ public class Main extends JavaPlugin {
 	
 	public static Map<CommandSender, Pair<ActionType, String>> getConfirmation() {
 		return confirmation;
+	}
+	
+	public static Map<HumanEntity, DungeonManager> getRenaming(){
+		return renaming;
 	}
 	
 	public static Map<Player, Location> getExitLocation() {

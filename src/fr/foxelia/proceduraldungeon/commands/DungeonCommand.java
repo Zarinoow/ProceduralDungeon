@@ -28,11 +28,11 @@ import fr.foxelia.proceduraldungeon.gui.GUIManager;
 import fr.foxelia.proceduraldungeon.gui.GUIType;
 import fr.foxelia.proceduraldungeon.utilities.ActionType;
 import fr.foxelia.proceduraldungeon.utilities.DungeonManager;
+import fr.foxelia.proceduraldungeon.utilities.Pair;
 import fr.foxelia.proceduraldungeon.utilities.WorldEditSchematic;
 import fr.foxelia.proceduraldungeon.utilities.rooms.Coordinate;
 import fr.foxelia.proceduraldungeon.utilities.rooms.Room;
 import net.md_5.bungee.api.ChatColor;
-import oshi.util.tuples.Pair;
 
 public class DungeonCommand implements CommandExecutor {
 
@@ -154,7 +154,7 @@ public class DungeonCommand implements CommandExecutor {
 				Main.getConfirmation().remove(sender);
 				
 // Import Action
-				if(confirm.getA().equals(ActionType.IMPORT)) {
+				if(confirm.getFirst().equals(ActionType.IMPORT)) {
 					if(!sender.hasPermission("proceduraldungeon.admin.create")) {
 						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("lackingpermission")
 								.replace("%permission%", "proceduraldungeon.admin.create")));
@@ -162,7 +162,7 @@ public class DungeonCommand implements CommandExecutor {
 					}
 					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getTaskMessage("dungeonimport")));
 					
-					DungeonManager dm = new DungeonManager(confirm.getB().toLowerCase());
+					DungeonManager dm = new DungeonManager(confirm.getSecond().toLowerCase());
 					try {
 						dm.restoreDungeon();
 					} catch (Exception e) {
@@ -182,7 +182,7 @@ public class DungeonCommand implements CommandExecutor {
 							.replace("%time%", String.valueOf(System.currentTimeMillis() - delay))));
 					return true;
 // Delete Action
-				} else if(confirm.getA().equals(ActionType.DELETE)) {
+				} else if(confirm.getFirst().equals(ActionType.DELETE)) {
 					if(!sender.hasPermission("proceduraldungeon.admin.delete")) {
 						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("lackingpermission")
 								.replace("%permission%", "proceduraldungeon.admin.delete")));
@@ -190,14 +190,14 @@ public class DungeonCommand implements CommandExecutor {
 					}
 					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getTaskMessage("dungeondelete")));
 					
-					if(!Main.getDungeons().containsKey(confirm.getB().toLowerCase())) {
-						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("doesnotexist").replace("%dungeon%", confirm.getB())));
+					if(!Main.getDungeons().containsKey(confirm.getSecond().toLowerCase())) {
+						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("doesnotexist").replace("%dungeon%", confirm.getSecond())));
 						return false;
 					}
 					
 					try {
-						DungeonManager dm = Main.getDungeons().get(confirm.getB().toLowerCase());
-						Main.getDungeons().remove(confirm.getB().toLowerCase());
+						DungeonManager dm = Main.getDungeons().get(confirm.getSecond().toLowerCase());
+						Main.getDungeons().remove(confirm.getSecond().toLowerCase());
 						Main.saveDungeons();
 						this.delete(dm.getDungeonFolder());
 						

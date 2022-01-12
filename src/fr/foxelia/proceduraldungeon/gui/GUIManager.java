@@ -6,7 +6,6 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -129,24 +128,6 @@ public class GUIManager {
 		}
 		
 		return new GUI(inventory, dungeon, null);
-	}
-	
-	public GUI createRenamingGUI(DungeonManager dungeon) {
-		inventory = Bukkit.createInventory(
-				null,
-				InventoryType.ANVIL,
-				ChatColor.translateAlternateColorCodes('&', Main.getGUIString("renameitem.title")
-						.replace("%dungeon%", dungeon.getName())));
-		
-		try {
-			inventory.setItem(0, constructItem(Material.valueOf(Main.getGUIString("dungeongui.items.rename.material")), 1,	dungeon.getName(), null));
-		} catch (Exception e) {
-			Main.getMain().getLogger().log(Level.WARNING, "Invalid material " + Main.getGUIString("dungeongui.items.rename.material") + " in the rename section. Attempt to retrieve the default value...");
-			inventory.setItem(0, constructItem(Material.PAPER, 1, dungeon.getName(), null));
-		}
-		
-		return new GUI(inventory, dungeon, null);
-		
 	}
 	
 	private ItemStack constructItem(Material material, int amount, String customName, List<String> lore) {

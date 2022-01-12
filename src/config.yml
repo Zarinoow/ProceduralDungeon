@@ -26,6 +26,7 @@ messages:
   others:
     deletedungeon: '&cWarning, this command is intended to permanently delete the &4%dungeon%&c dungeon, this action cannot be undone. Please confirm your operation with the command &4/dungeon confirm&c.'
     importdungeon: '&aA record of this dungeon appears to already exist. Would you want try to import it? Please confirm your operation with the command &b/dungeon confirm&a.'
+    renaming: '&aRenaming: Enter the new dungeon name. You will have 10 seconds to enter the new name.'
     reload: '&aDungeons configs and messages reloaded!'
 gui:
   dungeongui:
@@ -74,5 +75,3 @@ gui:
         material: PISTON
   roomgui:
     title: '&aEditing &8- &e%room%'
-  renameitem:
-    title: '&aRenaming &8- &e%dungeon%'
