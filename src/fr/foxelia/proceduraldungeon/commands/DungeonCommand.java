@@ -254,7 +254,11 @@ public class DungeonCommand implements CommandExecutor {
 						throw new NullPointerException("Room manager cannot be null");
 					}
 					WorldEditSchematic schematic = new WorldEditSchematic();
-					File roomFile = new File(dungeon.getDungeonRooms().getFolder(), "room_" + dungeon.getDungeonRooms().getFolder().length() + ".dungeon");
+					File roomFile;
+					for(int i = 0; true; i++) {
+						roomFile = new File(dungeon.getDungeonRooms().getFolder(), "room_" + i + ".dungeon");
+						if(!roomFile.exists()) break;
+					}
 					schematic.saveSchematic(p.getLocation().getBlock().getLocation(), WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(p)), roomFile);
 					if(schematic.getSaveException() != null) {
 						Main.sendInternalError(sender);
@@ -266,7 +270,9 @@ public class DungeonCommand implements CommandExecutor {
 					Room dungeonRoom = new Room(roomFile, coord);
 					dungeon.getDungeonRooms().addRoom(dungeonRoom);
 					
-					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getSuccessMessage("roomadded").replace("%dungeon%", dungeon.getName())));
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getSuccessMessage("roomadded")
+							.replace("%dungeon%", dungeon.getName())
+							.replace("%file%", roomFile.getName())));
 					return true;
 				}
 // Set Exit

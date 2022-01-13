@@ -7,10 +7,10 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
 import org.bukkit.Location;
@@ -44,7 +44,7 @@ public class Main extends JavaPlugin {
 	private static Map<CommandSender, Pair<ActionType, String>> confirmation = new HashMap<>();
 	private static Map<HumanEntity, DungeonManager> renaming = new HashMap<>();
 	private static Map<Player, Location> exitLocation = new HashMap<>();
-	private static List<GUI> guis = new ArrayList<GUI>();
+	private static List<GUI> guis = new CopyOnWriteArrayList<GUI>();
 	
 	@Override
 	public void onEnable() {

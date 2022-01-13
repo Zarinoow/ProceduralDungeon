@@ -1,6 +1,7 @@
 package fr.foxelia.proceduraldungeon.gui;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -9,14 +10,15 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.foxelia.proceduraldungeon.Main;
 import fr.foxelia.proceduraldungeon.utilities.DungeonManager;
+import fr.foxelia.proceduraldungeon.utilities.rooms.Room;
 import net.md_5.bungee.api.ChatColor;
 
 public class GUIListeners implements Listener {
@@ -24,6 +26,7 @@ public class GUIListeners implements Listener {
 	@EventHandler
 	public void onGUIInteract(InventoryClickEvent e) {
 		GUI gui = null;
+// Check ClickedGUI
 		for(GUI igui : Main.getGUIs()) {
 			if(igui.getInventory().equals(e.getInventory())) {
 				gui = igui;
@@ -31,10 +34,33 @@ public class GUIListeners implements Listener {
 			}
 		}
 		if(gui == null) return;
+		e.setCancelled(true);
+// Check if player can interact with the GUI
+		if(!e.getWhoClicked().hasPermission("proceduraldungeon.admin.edit")) {
+			e.getWhoClicked().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("lackingpermission").replace("%permission%", "proceduraldungeon.admin.edit")));
+			return;
+		}
+		
+// Check if the dungeons is not removed
+		if(!gui.getDungeon().getDungeonFolder().exists()) {
+			for(HumanEntity view : new ArrayList<>(gui.getInventory().getViewers())) {
+				view.closeInventory();
+			}
+		}
+		
+		if(gui.getRoom() != null && !gui.getRoom().getFile().exists()) {
+			for(HumanEntity view : new ArrayList<>(gui.getInventory().getViewers())) {
+				view.closeInventory();
+			}
+		}
+
+/*
+ * DungeonGUI menu
+ */		
 		
 		if(gui.getType().equals(GUIType.DUNGEON)) {
-			e.setCancelled(true);
 			switch(e.getSlot()) {
+// Rename Dungeon
 			case 2:
 				if(e.isLeftClick()) {
 					DungeonManager dungeon = gui.getDungeon();
@@ -59,6 +85,7 @@ public class GUIListeners implements Listener {
 					}, 200);
 				}
 				break;
+// Change Room Amount
 			case 4:
 				if(e.isLeftClick()) {
 					ItemStack item = e.getCurrentItem();
@@ -72,6 +99,7 @@ public class GUIListeners implements Listener {
 					gui.getDungeon().getConfig().set("roomcount", item.getAmount());
 				}
 				break;
+// Toggle Room Recyling
 			case 6:
 				if(e.isLeftClick()) {
 					ItemStack item = e.getCurrentItem();
@@ -100,6 +128,7 @@ public class GUIListeners implements Listener {
 					}
 				}
 				break;
+// Edit Room Properties
 			case 18:
 			case 19:
 			case 20:
@@ -135,21 +164,181 @@ public class GUIListeners implements Listener {
 			case 51:
 			case 52:
 			case 53:
-				if(e.getCurrentItem() == null) break;
+				if(e.isLeftClick()) {
+					if(e.getCurrentItem() == null) break;
+					
+					Room room = gui.getDungeon().getDungeonRooms().getRooms().get(e.getSlot() - 18);
+					
+					for(GUI opengui : Main.getGUIs()) {
+						if(opengui.getDungeon().equals(gui.getDungeon()) && opengui.getType().equals(GUIType.ROOM) && opengui.getRoom().equals(room)) {
+							e.getWhoClicked().openInventory(opengui.getInventory());
+							return;
+						}
+					}
+					
+					GUI newgui = new GUIManager().createRoomGUI(gui.getDungeon(), room);
+					Main.getGUIs().add(newgui);
+					e.getWhoClicked().openInventory(newgui.getInventory());
+				}
 				break;
+// Others
 			default:
 				break;
 			}
+/*
+ * RoomGUI menu
+ */
 		} else if(gui.getType().equals(GUIType.ROOM)) {
-			e.setCancelled(true);			
-		} else if(gui.getType().equals(GUIType.RENAMING)) {
-			switch (e.getSlot()) {
-			case 2:
-				System.out.println(((AnvilInventory) gui.getInventory()).getRenameText()); // Debug
+			switch(e.getSlot()) {
+// Go backward
+			case 0:
+				if(e.isLeftClick()) {
+					for(GUI opengui : Main.getGUIs()) {
+						if(opengui.getDungeon().equals(gui.getDungeon()) && opengui.getType().equals(GUIType.DUNGEON)) {
+							e.getWhoClicked().openInventory(opengui.getInventory());
+							return;
+						}
+					}
+					
+					GUI newgui = new GUIManager().createDungeonGUI(gui.getDungeon());
+					Main.getGUIs().add(newgui);
+					e.getWhoClicked().openInventory(newgui.getInventory());
+				}
 				break;
+// Delete Room
+			case 8:
+				if(e.isLeftClick()) {
+					if(!e.getWhoClicked().hasPermission("proceduraldungeon.admin.edit.deleteroom")) {
+						e.getWhoClicked().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("lackingpermission").replace("%permission%", "proceduraldungeon.admin.edit.deleteroom")));
+						break;
+					}
+					for(GUI opengui : Main.getGUIs()) {
+						if(opengui.getDungeon().equals(gui.getDungeon()) && opengui.getType().equals(GUIType.ROOM_DELETE) && opengui.getRoom().equals(gui.getRoom())) {
+							e.getWhoClicked().openInventory(opengui.getInventory());
+							return;
+						}
+					}
+					
+					GUI newgui = new GUIManager().createRoomDeleteGUI(gui.getDungeon(), gui.getRoom());
+					Main.getGUIs().add(newgui);
+					e.getWhoClicked().openInventory(newgui.getInventory());
+				}
+				break;
+// Change Room Spawn Percentage
+			case 12:
+			case 14:
+			case 21:
+			case 23:
+				if(e.isLeftClick()) {
+					int rate;
+					if(e.getSlot() == 12) {
+						rate = 1;
+					} else if(e.getSlot() == 14) {
+						rate = -1;
+					} else if(e.getSlot() == 21) {
+						rate = 10;
+					} else rate = -10;
+					gui.getRoom().addSpawnrate(rate);
+					
+					ItemStack item = e.getInventory().getItem(4);
+					ItemMeta im = item.getItemMeta();
+					im.setDisplayName(ChatColor.translateAlternateColorCodes('&', Main.getGUIString("roomgui.items.spawnrate.name").replace("%int%", String.valueOf(gui.getRoom().getSpawnrate()))));
+					item.setItemMeta(im);
+				}
+				break;
+// Others
 			default:
-//				e.setCancelled(true);
 				break;
+			} 
+/*
+ * Delete Room Confirmation
+ */
+		} else if(gui.getType().equals(GUIType.ROOM_DELETE)) {
+			switch(e.getSlot()) {
+// Confirm
+			case 3:
+				if(e.isLeftClick()) {
+	// Check if player steel have permission
+					if(!e.getWhoClicked().hasPermission("proceduraldungeon.admin.edit.deleteroom")) {
+						e.getWhoClicked().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("lackingpermission").replace("%permission%", "proceduraldungeon.admin.edit.deleteroom")));
+						break;
+					}
+	// Remember Task Time
+					long tasktime = System.currentTimeMillis();
+					
+	// Remember Room Viewers
+					List<HumanEntity> viewers = new ArrayList<>();
+					
+	// Get all viewers of delete confirmation
+					for(HumanEntity view : gui.getInventory().getViewers()) {
+						viewers.add(view);
+					}
+					
+	// Get all viewers of room configuration
+					for(GUI openGui : Main.getGUIs()) {
+						if(openGui.getDungeon().equals(gui.getDungeon()) && openGui.getType().equals(GUIType.ROOM) && openGui.getRoom().equals(gui.getRoom())) {
+							for(HumanEntity view : openGui.getInventory().getViewers()) {
+								viewers.add(view);
+							}
+							break;
+						}
+					}
+					
+	// Close the inventory for all and send messsage
+					for(HumanEntity view : viewers) {
+						view.closeInventory();
+						view.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getTaskMessage("roomdelete").replace("%room%", gui.getRoom().getFile().getName().replace(".dungeon", ""))));
+					}
+					
+	// Remove the rooms					
+					gui.getDungeon().getDungeonRooms().getRooms().remove(gui.getRoom());
+					gui.getRoom().getFile().delete();
+					gui.getDungeon().getDungeonRooms().saveRooms();
+					
+	// Saving the player editing the dungeon
+					List<HumanEntity> inConfig = new ArrayList<>();
+					GUI inConfigGUI = null;
+					for(GUI opengui : Main.getGUIs()) {
+						if(opengui.getDungeon().equals(gui.getDungeon()) && opengui.getType().equals(GUIType.DUNGEON)) {
+							for(HumanEntity view : opengui.getInventory().getViewers()) {
+								inConfig.add(view);
+							}
+							inConfigGUI = opengui;
+							break;
+						}
+					}
+					if(inConfigGUI != null) Main.getGUIs().remove(inConfigGUI);
+	// Open the main GUI for all viewers of the Dungeon
+					GUI newgui = new GUIManager().createDungeonGUI(gui.getDungeon());
+					Main.getGUIs().add(newgui);
+					for(HumanEntity view : inConfig) {
+						view.openInventory(newgui.getInventory());
+					}
+					tasktime = System.currentTimeMillis() - tasktime;
+					for(HumanEntity view : viewers) {
+						view.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getTaskMessage("timetook").replace("%time%", String.valueOf(tasktime))));
+						view.openInventory(newgui.getInventory());
+					}
+					
+				}
+				break;
+// Cancel
+			case 5:
+				if(e.isLeftClick()) {
+					for(GUI opengui : Main.getGUIs()) {
+						if(opengui.getDungeon().equals(gui.getDungeon()) && opengui.getType().equals(GUIType.ROOM) && opengui.getRoom().equals(gui.getRoom())) {
+							e.getWhoClicked().openInventory(opengui.getInventory());
+							return;
+						}
+					}
+					
+					GUI newgui = new GUIManager().createRoomGUI(gui.getDungeon(), gui.getRoom());
+					Main.getGUIs().add(newgui);
+					e.getWhoClicked().openInventory(newgui.getInventory());
+				}
+				break;
+// Others
+			default: break;
 			}
 		}
 		
@@ -192,12 +381,28 @@ public class GUIListeners implements Listener {
 				if(removegui != null) Main.getGUIs().remove(removegui);
 				Main.getGUIs().add(newgui);
 				
-				e.getPlayer().openInventory(newgui.getInventory());			
+				e.getPlayer().openInventory(newgui.getInventory());		
 			}
 		};
 		
 		run.runTask(Main.getProceduralDungeon());
 	}
 	
-	
+	@EventHandler
+	public void onInventoryClose(InventoryCloseEvent e) {	
+		GUI gui = null;
+		for(GUI igui : Main.getGUIs()) {
+			if(igui.getInventory().equals(e.getInventory())) {
+				gui = igui;
+				break;
+			}
+		}
+		if(gui == null) return;
+		
+		if(e.getInventory().getViewers().size() <= 1) {
+			Main.getGUIs().remove(gui);
+			gui.getDungeon().getDungeonRooms().saveRooms();
+			gui.getDungeon().getDungeonConfig().saveConfig();
+		}
+	}	
 }

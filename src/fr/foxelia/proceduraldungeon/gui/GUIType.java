@@ -1,5 +1,5 @@
 package fr.foxelia.proceduraldungeon.gui;
 
 public enum GUIType {
-	DUNGEON, ROOM, RENAMING;
+	DUNGEON, ROOM, ROOM_DELETE;
 }

@@ -15,13 +15,14 @@ messages:
     noconsole: '&c[Error] Sorry, only a player can perform this command!'
   success:
     exitset: '&aYou have successfully defined the exit point at the coordinates &e%x%&a, &e%y%&a, &e%z%&a.'
-    roomadded: '&aYou have successfully added a room to the &e%dungeon%&a dungeon'
+    roomadded: '&aYou have successfully added a room to the &e%dungeon%&a dungeon. File saved as &e%file%&a.'
     removedfromconfig: '&aThe dungeon %dungeon% was successfully removed from the config.'
   tasks:
     actioncanceled: '&cOperation canceled!'
     dungeoncreation: '&aStarting the creation of the dungeon...'
     dungeondelete: '&cDeleting...'
     dungeonimport: '&aStarting the import of the dungeon...'
+    roomdelete: '&cStarting to delete %room%...'
     timetook: '&aFinished! Took %time%ms.'
   others:
     deletedungeon: '&cWarning, this command is intended to permanently delete the &4%dungeon%&c dungeon, this action cannot be undone. Please confirm your operation with the command &4/dungeon confirm&c.'
@@ -75,3 +76,55 @@ gui:
         material: PISTON
   roomgui:
     title: '&aEditing &8- &e%room%'
+    items:
+      roomitem:
+        name: '&aRoom &e%int%'
+        lore:
+        - '&bEditing room properties'
+        - ''
+        - '&7Left click to go back'
+        material: PISTON
+      spawnrate:
+        name: '&aGeneration rate &e%int%%'
+        lore:
+        - '&bThe generation rate of the room'
+        material: DISPENSER
+      addspawnrate:
+        name: '&a+ &e%int%%'
+        lore:
+        - '&bIncreases the generation rate'
+        - ''
+        - '&7Left click to &aincrease'
+        material: LIME_STAINED_GLASS_PANE
+      lowerspawnrate:
+        name: '&c- &6%int%%'
+        lore:
+        - '&bDecreases the generation rate'
+        - ''
+        - '&7Left click to &cdecrease'
+        material: RED_STAINED_GLASS_PANE
+      delete:
+        name: '&cDelete the room'
+        lore:
+        - '&bDeletes the room’s corresponding files'
+        - '&cWarning! This action is permanent and &oirreversible'
+        - ''
+        - '&7Left click to &cdelete'
+        material: BARRIER
+  deletegui:
+    title: '&cAre you sure to delete &4%room%&c?'
+    items:
+      confirm:
+        name: '&aYes!'
+        lore:
+        - '&bThis action will permanently destroy this room.'
+        - ''
+        - '&7Left click to &aConfirm'
+        material: LIME_STAINED_GLASS_PANE
+      cancel:
+        name: '&cNo.'
+        lore:
+        - '&bKeep the room and do not delete anything'
+        - ''
+        - '&7Left click to &cCancel'
+        material: RED_STAINED_GLASS_PANE

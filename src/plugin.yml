@@ -24,5 +24,7 @@ permissions:
     default: op
   proceduraldungeon.admin.edit:
     default: op
+  proceduraldungeon.admin.edit.deleteroom:
+    default: op
   proceduraldungeon.admin.list:
     default: op

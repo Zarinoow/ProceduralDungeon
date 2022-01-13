@@ -34,11 +34,12 @@ public class RoomsManager {
 			File keyFile = new File(folder, key + ".dungeon");
 			if(!keyFile.exists()) continue;
 			String[] values = (properties.getProperty(key).split(","));
-			if(values.length < 3) continue;
+			if(values.length < 4) continue;
 			for(String str : values) {
 				if(!isNumeric(str)) continue;
 			}			
 			Room dungeonRoom = new Room(keyFile, new Coordinate(Double.parseDouble(values[0]), Double.parseDouble(values[1]), Double.parseDouble(values[2])));
+			dungeonRoom.setSpawnrate(Integer.parseInt(values[3]));
 			this.getRooms().add(dungeonRoom);
 		}
 	}
@@ -65,7 +66,7 @@ public class RoomsManager {
 		try {
 			propertiesFile.createNewFile();
 			properties.clear();
-			for(Room room : rooms) properties.setProperty(room.getFile().getName().replace(".dungeon", ""), room.getExit().getX() + "," + room.getExit().getY() + "," + room.getExit().getZ());
+			for(Room room : rooms) properties.setProperty(room.getFile().getName().replace(".dungeon", ""), room.getExit().getX() + "," + room.getExit().getY() + "," + room.getExit().getZ() + "," + room.getSpawnrate());
 			properties.store(new FileOutputStream(propertiesFile), null);
 		} catch (IOException e) {
 			e.printStackTrace();

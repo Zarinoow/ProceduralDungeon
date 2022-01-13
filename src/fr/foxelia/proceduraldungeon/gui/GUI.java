@@ -1,6 +1,5 @@
 package fr.foxelia.proceduraldungeon.gui;
 
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
 import fr.foxelia.proceduraldungeon.utilities.DungeonManager;
@@ -13,13 +12,13 @@ public class GUI {
 	private Room room;
 	private GUIType type;
 	
-	public GUI(Inventory inventory, DungeonManager dungeon, Room room) {
+	public GUI(Inventory inventory, DungeonManager dungeon, Room room, boolean delete) {
 		this.inventory = inventory;
 		this.dungeon = dungeon;
 		this.room = room;
 		
-		if(inventory.getType().equals(InventoryType.ANVIL)) {
-			this.type = GUIType.RENAMING;
+		if(delete && room != null) {
+			this.type = GUIType.ROOM_DELETE;
 		} else if(room == null) {
 			this.type = GUIType.DUNGEON;
 		} else if(dungeon != null & room != null) {
