@@ -21,7 +21,9 @@ public class RoomsManager {
 		propertiesFile = new File(folder, "rooms.properties");
 		try {
 			if(!propertiesFile.exists()) propertiesFile.createNewFile();
-			properties.load(new FileInputStream(propertiesFile));
+			FileInputStream fis = new FileInputStream(propertiesFile);
+			properties.load(fis);
+			fis.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
@@ -67,7 +69,9 @@ public class RoomsManager {
 			propertiesFile.createNewFile();
 			properties.clear();
 			for(Room room : rooms) properties.setProperty(room.getFile().getName().replace(".dungeon", ""), room.getExit().getX() + "," + room.getExit().getY() + "," + room.getExit().getZ() + "," + room.getSpawnrate());
-			properties.store(new FileOutputStream(propertiesFile), null);
+			FileOutputStream fos = new FileOutputStream(propertiesFile);
+			properties.store(fos, null);
+			fos.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
