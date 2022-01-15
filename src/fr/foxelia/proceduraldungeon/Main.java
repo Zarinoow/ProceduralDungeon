@@ -55,16 +55,17 @@ public class Main extends JavaPlugin {
 		 */
 		
 		getLogger().log(Level.INFO, ChatColor.DARK_GREEN + "======");
-		getLogger().log(Level.INFO, ChatColor.DARK_GREEN + "ProceduralDungeon");
+		getLogger().log(Level.INFO, ChatColor.DARK_GREEN + getDescription().getName());
 		getLogger().log(Level.INFO, ChatColor.DARK_GREEN + "Initializing...");
 		getLogger().log(Level.INFO, "");
-		getLogger().log(Level.INFO, ChatColor.DARK_GREEN + "Version 1.0.0");
+		getLogger().log(Level.INFO, ChatColor.DARK_GREEN + "Version " + getDescription().getVersion());
 		getLogger().log(Level.INFO, ChatColor.RED + "/!\\ Attention Pré-release /!\\");
 //		getLogger().log(Level.INFO, ChatColor.RED + "/!\\ Attention ReleaseCandidate /!\\");
 		getLogger().log(Level.INFO, ChatColor.RED + "Ce build n'est pas terminée");
 		getLogger().log(Level.INFO, ChatColor.RED + "Il peut donc contenir des bugs");
 		getLogger().log(Level.INFO, "");
-		getLogger().log(Level.INFO, ChatColor.DARK_GREEN + "By Foxelia Server");
+		getLogger().log(Level.INFO, ChatColor.GOLD + "Designed for Foxelia Server");
+		getLogger().log(Level.INFO, ChatColor.YELLOW + "By " + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
 		getLogger().log(Level.INFO, ChatColor.DARK_GREEN + "======");
 		
 		/*
@@ -213,6 +214,10 @@ public class Main extends JavaPlugin {
 	
 	public static String getOthersMessage(String message) {
 		return getMain().getConfig().getString("messages.others." + message);
+	}
+	
+	public static String getHelpMessage(String message) {
+		return getMain().getConfig().getString("messages.help." + message);
 	}
 	
 	public static String getGUIString(String string) {

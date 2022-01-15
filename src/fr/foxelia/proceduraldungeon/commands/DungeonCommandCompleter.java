@@ -23,13 +23,14 @@ public class DungeonCommandCompleter implements TabCompleter {
 			if(sender.hasPermission("proceduraldungeon.admin.create")) suggest.add("create");
 			if(sender.hasPermission("proceduraldungeon.admin.remove")) suggest.add("remove");
 			if(sender.hasPermission("proceduraldungeon.admin.delete")) suggest.add("delete");
-			if(sender.hasPermission("proceduraldungeon.admin.edit")) suggest.add("edit"); // Work In Progress
+			if(sender.hasPermission("proceduraldungeon.admin.edit")) suggest.add("edit");
 			if(sender.hasPermission("proceduraldungeon.admin.addroom") && sender instanceof Player) {
 				suggest.add("addroom");
 				suggest.add("setexit");
 			}
 			if(sender.hasPermission("proceduraldungeon.admin.generate")) suggest.add("generate"); // Not coded
-			if(sender.hasPermission("proceduraldungeon.admin.list")) suggest.add("list"); // Not coded
+			if(sender.hasPermission("proceduraldungeon.admin.list")) suggest.add("list");
+			if(sender.hasPermission("proceduraldungeon.dungeon")) suggest.add("help");
 			if(Main.getConfirmation().containsKey(sender)) suggest.add("confirm");
 		} else if(args.length == 2) {
 // /dungeon remove

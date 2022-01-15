@@ -8,11 +8,12 @@ messages:
     exitincorectregion: '&c[Error] The exit is no more located on the north side or in the area. Did you move the selection?'
     importantaction: '&c[Error] A previous important action requires your attention, please confirm the previous action or wait for its expiration.'
     internalerror: '&c[Error] Internal error! Please check the details in logs.'
-    invalidcmd: '&c[Error] Incomplete command! Try /help.'
+    invalidcmd: '&c[Error] Incomplete command! Try /dungeon help.'
     invalidregion: '&c[Error] Your WorldEdit selection is incomplete!'
     lackingpermission: '&c[Error] You are lacking the permission: &4%permission%'
     originincorectlocation: '&c[Error] The room entrance can only be defined on the south side of the selection (&4Z= %z%&c needed).'
     noconsole: '&c[Error] Sorry, only a player can perform this command!'
+    nodungeon: '&c[Error] Sorry, unable to list all dungeons. There is no dungeon loaded or to import.'
   success:
     exitset: '&aYou have successfully defined the exit point at the coordinates &e%x%&a, &e%y%&a, &e%z%&a.'
     roomadded: '&aYou have successfully added a room to the &e%dungeon%&a dungeon. File saved as &e%file%&a.'
@@ -29,6 +30,27 @@ messages:
     importdungeon: '&aA record of this dungeon appears to already exist. Would you want try to import it? Please confirm your operation with the command &b/dungeon confirm&a.'
     renaming: '&aRenaming: Enter the new dungeon name. You will have 10 seconds to enter the new name.'
     reload: '&aDungeons configs and messages reloaded!'
+    listtop: '&8------ &7[&bDungeons List&7] &8------'
+    listcontent: '&8- &b%dungeon% &8- &7%status%'
+    listbottom: '&8--------------------------'
+    liststatus:
+      loaded: '&aLoaded'
+      unloaded: '&7Unloaded'
+  help:
+    helptop: '&8------ &7[&bDungeons Commands&7] &8------'
+    helpcmd: '&8/&b%cmd% &8- &7%info%'
+    helpbottom: '&8-------------------------------'
+    info:
+      reload: 'Reload configuration and reload dungeons'
+      create: 'Create/Import a dungeon'
+      remove: 'Removes the dungeon from the configuration and keeps these files'
+      delete: 'Permanently deletes a dungeon including files'
+      edit: 'Configure properties of a dungeon or a room'
+      addroom: 'Creates a room for the specified dungeon'
+      setexit: 'Define the exit of the future room'
+      generate: 'Generates the specified dungeon depending on these properties'
+      list: 'Lists all created dungeons'
+      help: 'Display this help page'
 gui:
   dungeongui:
     title: '&aEditing &8- &e%dungeon%'

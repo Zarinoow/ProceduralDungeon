@@ -3,6 +3,7 @@ package fr.foxelia.proceduraldungeon.commands;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -59,8 +60,93 @@ public class DungeonCommand implements CommandExecutor {
 				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getOthersMessage("reload")));
 				return true;
 /*
- * Create Command
+ * Help Command
  */
+			} else if(args[0].equalsIgnoreCase("help") && sender.hasPermission("proceduraldungeon.dungeon")) { 
+				boolean isPlayer = (sender instanceof Player);
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getHelpMessage("helptop")));
+				if(sender.hasPermission("proceduraldungeon.admin.reload")) {
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getHelpMessage("helpcmd")
+							.replace("%cmd%", "dungeon reload")
+							.replace("%info%", Main.getHelpMessage("info.reload"))));
+				}
+				if(sender.hasPermission("proceduraldungeon.admin.create")) {
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getHelpMessage("helpcmd")
+							.replace("%cmd%", "dungeon create {dungeonname}")
+							.replace("%info%", Main.getHelpMessage("info.create"))));
+				}
+				if(sender.hasPermission("proceduraldungeon.admin.remove")) {
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getHelpMessage("helpcmd")
+							.replace("%cmd%", "dungeon remove {dungeonname}")
+							.replace("%info%", Main.getHelpMessage("info.remove"))));
+				}
+				if(sender.hasPermission("proceduraldungeon.admin.delete")) {
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getHelpMessage("helpcmd")
+							.replace("%cmd%", "dungeon delete {dungeonname}")
+							.replace("%info%", Main.getHelpMessage("info.delete"))));
+				}
+				if(sender.hasPermission("proceduraldungeon.admin.edit")) {
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getHelpMessage("helpcmd")
+							.replace("%cmd%", "dungeon edit {dungeonname}")
+							.replace("%info%", Main.getHelpMessage("info.edit"))));
+				}
+				if(sender.hasPermission("proceduraldungeon.admin.addroom") && isPlayer) {
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getHelpMessage("helpcmd")
+							.replace("%cmd%", "dungeon addroom {dungeonname}")
+							.replace("%info%", Main.getHelpMessage("info.addroom"))));
+				}
+				if(sender.hasPermission("proceduraldungeon.admin.addroom") && isPlayer) {
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getHelpMessage("helpcmd")
+							.replace("%cmd%", "dungeon setexit")
+							.replace("%info%", Main.getHelpMessage("info.setexit"))));
+				}
+				if(sender.hasPermission("proceduraldungeon.admin.generate")) {
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getHelpMessage("helpcmd")
+							.replace("%cmd%", "dungeon generate {dungeonname} {x} {y} {z} (World)")
+							.replace("%info%", Main.getHelpMessage("info.generate"))));
+				}
+				if(sender.hasPermission("proceduraldungeon.admin.list")) {
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getHelpMessage("helpcmd")
+							.replace("%cmd%", "dungeon list")
+							.replace("%info%", Main.getHelpMessage("info.list"))));
+				}
+			
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getHelpMessage("helpcmd")
+						.replace("%cmd%", "dungeon help")
+						.replace("%info%", Main.getHelpMessage("info.help"))));
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getHelpMessage("helpbottom")));
+				return true;
+/*
+ * List Command
+ */
+			} else if(args[0].equalsIgnoreCase("list") && sender.hasPermission("proceduraldungeon.admin.list")) {
+				File dungeonFolder = new File(Main.getProceduralDungeon().getDataFolder(), "dungeons");
+				if(!dungeonFolder.exists() || dungeonFolder.listFiles().length == 0) {
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("nodungeon")));
+					return false;
+				}
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getOthersMessage("listtop")));
+				List<String> loadeds= new ArrayList<>();
+				for(DungeonManager dm : Main.getDungeons().values()) {
+					loadeds.add(dm.getDungeonFolder().getName());
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getOthersMessage("listcontent")
+							.replace("%dungeon%", dm.getName())
+							.replace("%status%", Main.getOthersMessage("liststatus.loaded"))));
+				}
+				
+				for(File removed : dungeonFolder.listFiles()) {
+					if(loadeds.contains(removed.getName()) || removed.isFile()) continue;
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getOthersMessage("listcontent")
+							.replace("%dungeon%", removed.getName())
+							.replace("%status%", Main.getOthersMessage("liststatus.unloaded"))));
+				}
+				
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getOthersMessage("listbottom")));
+				return true;
+				
+/*
+ * Create Command
+ */	
 			} else if(args[0].equalsIgnoreCase("create") && sender.hasPermission("proceduraldungeon.admin.create")) {
 				if(args.length >= 2) {
 					Long delay = System.currentTimeMillis();
