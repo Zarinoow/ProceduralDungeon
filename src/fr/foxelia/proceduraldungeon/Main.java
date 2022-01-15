@@ -24,6 +24,7 @@ import fr.foxelia.proceduraldungeon.commands.DungeonCommandCompleter;
 import fr.foxelia.proceduraldungeon.gui.GUI;
 import fr.foxelia.proceduraldungeon.gui.GUIListeners;
 import fr.foxelia.proceduraldungeon.utilities.ActionType;
+import fr.foxelia.proceduraldungeon.utilities.BStats;
 import fr.foxelia.proceduraldungeon.utilities.DungeonManager;
 import fr.foxelia.proceduraldungeon.utilities.Pair;
 import net.md_5.bungee.api.ChatColor;
@@ -80,6 +81,20 @@ public class Main extends JavaPlugin {
 		getCommand("dungeon").setTabCompleter(new DungeonCommandCompleter());
 		getServer().getPluginManager().registerEvents(new GUIListeners(), this);
 		
+		BStats metrics = new BStats(this, 13962);
+		if(getDungeons().size() != 0) {
+			int dungeonnumber = getDungeons().size();
+			int roomaveragecalc = 0;
+			
+			for(DungeonManager dm : getDungeons().values()) {
+				roomaveragecalc += dm.getDungeonRooms().getRooms().size();
+			}
+			roomaveragecalc /= dungeonnumber;
+			int roomaverage = roomaveragecalc;
+			
+			metrics.addCustomChart(new BStats.SimplePie("dungeon_number", () -> String.valueOf(dungeonnumber)));
+			metrics.addCustomChart(new BStats.SimplePie("average_room_count", () -> String.valueOf(roomaverage)));
+		}
 	}
 	
 	@Override
