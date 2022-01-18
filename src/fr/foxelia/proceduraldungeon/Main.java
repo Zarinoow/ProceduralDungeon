@@ -31,14 +31,6 @@ import net.md_5.bungee.api.ChatColor;
 
 public class Main extends JavaPlugin {
 	
-	/*
-	 * Todo list
-	 * 
-	 * % chance d'une salle
-	 * Générée le donjon
-	 * Crée une room
-	 * 
-	 */
 	private static Main mainclass;
 	
 	private static Map<String, DungeonManager> dungeons = new HashMap<>();

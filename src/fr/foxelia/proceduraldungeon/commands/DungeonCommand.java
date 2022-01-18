@@ -93,7 +93,7 @@ public class DungeonCommand implements CommandExecutor {
 				}
 				if(sender.hasPermission("proceduraldungeon.admin.addroom") && isPlayer) {
 					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getHelpMessage("helpcmd")
-							.replace("%cmd%", "dungeon addroom {dungeonname}")
+							.replace("%cmd%", "dungeon addroom {dungeonname} (customname)")
 							.replace("%info%", Main.getHelpMessage("info.addroom"))));
 				}
 				if(sender.hasPermission("proceduraldungeon.admin.addroom") && isPlayer) {
@@ -342,10 +342,23 @@ public class DungeonCommand implements CommandExecutor {
 					}
 					WorldEditSchematic schematic = new WorldEditSchematic();
 					File roomFile;
-					for(int i = 0; true; i++) {
-						roomFile = new File(dungeon.getDungeonRooms().getFolder(), "room_" + i + ".dungeon");
-						if(!roomFile.exists()) break;
+					if(args.length > 2) {
+						roomFile = new File(dungeon.getDungeonRooms().getFolder(), args[2].replace(".dungeon", "") + ".dungeon");
+						if(roomFile.getName().equals(".dungeon")) {
+							sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("namenull")));
+							return false;
+						}
+						if(roomFile.exists()) {
+							sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("namealreadytaken")));
+							return false;
+						}
+					} else {
+						for(int i = 0; true; i++) {
+							roomFile = new File(dungeon.getDungeonRooms().getFolder(), "room_" + i + ".dungeon");
+							if(!roomFile.exists()) break;
+						}
 					}
+					
 					schematic.saveSchematic(p.getLocation().getBlock().getLocation(), WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(p)), roomFile);
 					if(schematic.getSaveException() != null) {
 						Main.sendInternalError(sender);
