@@ -10,6 +10,7 @@ import javax.management.InstanceAlreadyExistsException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -85,7 +86,7 @@ public class DungeonCommand implements CommandExecutor {
 							.replace("%cmd%", "dungeon delete {dungeonname}")
 							.replace("%info%", Main.getHelpMessage("info.delete"))));
 				}
-				if(sender.hasPermission("proceduraldungeon.admin.edit")) {
+				if(sender.hasPermission("proceduraldungeon.admin.edit") && isPlayer) {
 					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getHelpMessage("helpcmd")
 							.replace("%cmd%", "dungeon edit {dungeonname}")
 							.replace("%info%", Main.getHelpMessage("info.edit"))));
@@ -352,7 +353,7 @@ public class DungeonCommand implements CommandExecutor {
 						return false;
 					}
 					
-					Coordinate coord = generateCoordinate(pr, Main.getExitLocation().get(p));
+					Coordinate coord = generateCoordinate(p.getLocation(), Main.getExitLocation().get(p));
 					Room dungeonRoom = new Room(roomFile, coord);
 					dungeon.getDungeonRooms().addRoom(dungeonRoom);
 					
@@ -421,6 +422,95 @@ public class DungeonCommand implements CommandExecutor {
 					p.openInventory(gui.getInventory());
 					return true;
 				}
+/*
+ * Generate
+ * dungeon generate dungeon x y z world
+ * cmd     0        1       2 3 4 5
+ * total   6
+ */
+			} else if(args[0].equalsIgnoreCase("generate") && sender.hasPermission("proceduraldungeon.admin.generate")) {
+				
+				if(args.length >= 5) {
+// Check Dungeon Exist
+					if(!Main.getDungeons().containsKey(args[1].toLowerCase())) {
+						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("doesnotexist").replace("%dungeon%", args[1])));
+						return false;
+					}
+					
+					boolean isPlayer = false;
+					if(sender instanceof Player) isPlayer = true;
+					
+// Check if coordinate are Numeric
+					for(int i = 2; i <= 4; i++) {
+						if(!isNumeric(args[i])) {
+							if(isPlayer && args[i].equals("~")) continue;
+							sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("invalidcoordinates")));
+							return false;
+						}
+					}
+					
+// Check World is correct
+					if(args.length == 5 && !isPlayer) {
+						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("missingworld")));
+						return false;
+					}
+					
+					World world;
+					if(args.length >= 6) {
+						world = Bukkit.getWorld(args[5]);
+						if(world == null) {
+							sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("invalidworld")));
+							return false;
+						}
+					} else {
+						world = ((Player) sender).getWorld();
+					}
+					
+// Init usefull variables
+					double x;
+					double y;
+					double z;
+					if(args[2].equals("~")) {
+						x = ((Player) sender).getLocation().getBlockX();
+					} else {
+						x = Double.parseDouble(args[2]);
+					}
+					
+					if(args[3].equals("~")) {
+						y = ((Player) sender).getLocation().getBlockY();
+					} else {
+						y = Double.parseDouble(args[3]);
+					}
+					
+					if(args[4].equals("~")) {
+						z = ((Player) sender).getLocation().getBlockZ();
+					} else {
+						z = Double.parseDouble(args[4]);
+					}
+					
+					Location dungeonLoc = new Location(world, x, y, z);
+					DungeonManager dungeon = Main.getDungeons().get(args[1].toLowerCase());
+					
+					if(dungeon.getDungeonRooms().getRooms().size() == 0) {
+						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("norooms")));
+						return false;
+					}
+					
+// Start gen task
+					Long taskTime = System.currentTimeMillis();
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getTaskMessage("dungeongeneration")));
+					
+					if(!DungeonManager.generateDungeon(dungeon, dungeonLoc)) {
+						Main.sendInternalError(sender);
+						return false;
+					}
+					
+// Generation Success
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getTaskMessage("timetook")
+							.replace("%time%", String.valueOf(System.currentTimeMillis() - taskTime))));
+					return true;
+				}
+				
 			}
 /*
  * End
@@ -464,12 +554,19 @@ public class DungeonCommand implements CommandExecutor {
 		} else return false;
 	}
 	
-	private Coordinate generateCoordinate(Region selection, Location origin) {
-		
-		double maxX = Math.max(selection.getMinimumPoint().getBlockX(), selection.getMaximumPoint().getBlockX());
-		double maxY = Math.max(selection.getMinimumPoint().getBlockY(), selection.getMaximumPoint().getBlockY());
-		double maxZ = Math.max(selection.getMinimumPoint().getBlockZ(), selection.getMaximumPoint().getBlockZ());
-		
-		return new Coordinate(maxX - origin.getBlockX(), maxY - origin.getBlockY(), maxZ - origin.getBlockZ());
+	private Coordinate generateCoordinate(Location origin, Location exit) {
+		return new Coordinate(exit.getBlockX() - origin.getBlockX(), exit.getBlockY() - origin.getBlockY(), exit.getBlockZ() - origin.getBlockZ());
+	}
+	
+	private boolean isNumeric(String strNum) {
+	    if(strNum == null) {
+	        return false;
+	    }
+	    try {
+	        Double.parseDouble(strNum);
+	    } catch (NumberFormatException e) {
+	        return false;
+	    }
+	    return true;
 	}
 }

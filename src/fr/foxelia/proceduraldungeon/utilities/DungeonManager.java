@@ -1,12 +1,18 @@
 package fr.foxelia.proceduraldungeon.utilities;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.logging.Level;
 
 import javax.management.InstanceAlreadyExistsException;
 
+import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import fr.foxelia.proceduraldungeon.Main;
+import fr.foxelia.proceduraldungeon.utilities.rooms.Room;
 import fr.foxelia.proceduraldungeon.utilities.rooms.RoomsManager;
 
 public class DungeonManager {
@@ -94,5 +100,48 @@ public class DungeonManager {
 			if(dm.getDungeonFolder().getName().equals(this.getDungeonFolder().getName())) return true;
 		}
 		return false;
+	}
+	
+	/*
+	 * Statics
+	 */
+	
+	public static boolean generateDungeon(DungeonManager dungeon, Location spawnLoc) {
+		spawnLoc.add(0, 0, -1);
+		Random rand = new Random();
+		List<Room> used = new ArrayList<>();
+		
+		for(int i = 0; i < dungeon.getConfig().getInt("roomcount"); i++) {
+			boolean roomfound = false;
+			Room roomchoosen = null;
+			do {
+				if(dungeon.getDungeonRooms().getRooms().size() <= 0) {
+					Main.getMain().getLogger().log(Level.SEVERE, "No generatable rooms left. Aborting.");
+					return false;
+				}
+				if(used.size() >= dungeon.getDungeonRooms().getRooms().size()) used.clear();
+				int choose = rand.nextInt(0, dungeon.getDungeonRooms().getRooms().size());
+				roomchoosen = dungeon.getDungeonRooms().getRooms().get(choose);
+				if(!dungeon.getConfig().getBoolean("roomrecyling") && used.contains(roomchoosen)) continue;
+				if(!roomchoosen.getFile().exists()) {
+					Main.getMain().getLogger().log(Level.WARNING, "The file \"" + roomchoosen.getFile().getName() + "\" was previously incorrectly deleted. Please, prefer supression through /dungeon edit " + dungeon.getName() + ". The file will be removed from memory automagically.");
+					dungeon.getDungeonRooms().saveRooms();
+					dungeon.getDungeonRooms().getRooms().remove(roomchoosen);
+					continue;
+				}
+				if(roomchoosen.getSpawnrate() <= 0) used.add(roomchoosen);
+				choose = rand.nextInt(1, 101);
+				if(roomchoosen.getSpawnrate() >= choose) {
+					used.add(roomchoosen);
+					roomfound = true;
+				}
+			} while(!roomfound);	
+			
+			WorldEditSchematic schematic = new WorldEditSchematic();
+			schematic.loadSchematic(roomchoosen.getFile());
+			schematic.pasteSchematic(spawnLoc);
+			spawnLoc.add(roomchoosen.getExit().getX(), roomchoosen.getExit().getY(), roomchoosen.getExit().getZ() - 1);
+		}
+		return true;
 	}
 }
