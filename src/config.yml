@@ -1,0 +1,159 @@
+messages:
+  errors:
+    alreadyexist: '&c[Error] The dungeon %dungeon% already exist!' 
+    doesnotexist: '&c[Error] The dungeon %dungeon% doesn’t exist!'
+    duplicatename: '&c[Error] Unable to load folder &4%folder%&c, another dungeon with this name is already in use. This dungeon is no longer loaded. You can re-import it with the command &4/dungeon create %folder%&c.'
+    exitnotset: '&c[Error] Firstly, you need to define an exit before being able to add a room. Use &4/dungeon setexit&c.'
+    exitincorectlocation: '&c[Error] The exit can only be defined on the north side of the selection (&4Z= %z%&c needed).'
+    exitincorectregion: '&c[Error] The exit is no more located on the north side or in the area. Did you move the selection?'
+    importantaction: '&c[Error] A previous important action requires your attention, please confirm the previous action or wait for its expiration.'
+    internalerror: '&c[Error] Internal error! Please check the details in logs.'
+    invalidcmd: '&c[Error] Incomplete command! Try /dungeon help.'
+    invalidcoordinates: '&c[Error] The coordinates provided are alphanumeric. Only numeric coordinates are allowed!'
+    invalidregion: '&c[Error] Your WorldEdit selection is incomplete!'
+    invalidworld: '&c[Error] The specified world can not be identified.'
+    lackingpermission: '&c[Error] You are lacking the permission: &4%permission%'
+    missingworld: '&c[Error] The console must specify the world in which the dungeon should be generated.'
+    originincorectlocation: '&c[Error] The room entrance can only be defined on the south side of the selection (&4Z= %z%&c needed).'
+    namenull: '&c[Error] The room name cannot be null!'
+    namealreadytaken: '&c[Error] A room with the same name already exist for this dungeon!'
+    noconsole: '&c[Error] Sorry, only a player can perform this command!'
+    nodungeon: '&c[Error] Sorry, unable to list all dungeons. There is no dungeon loaded or to import.'
+    norooms: '&c[Error] Sorry, this dungeon doesn’t have any rooms.'
+  success:
+    exitset: '&aYou have successfully defined the exit point at the coordinates &e%x%&a, &e%y%&a, &e%z%&a.'
+    roomadded: '&aYou have successfully added a room to the &e%dungeon%&a dungeon. File saved as &e%file%&a.'
+    removedfromconfig: '&aThe dungeon %dungeon% was successfully removed from the config.'
+  tasks:
+    actioncanceled: '&cOperation canceled!'
+    dungeoncreation: '&aStarting the creation of the dungeon...'
+    dungeondelete: '&cDeleting...'
+    dungeongeneration: '&aStarting the dungeon generation...'
+    dungeonimport: '&aStarting the import of the dungeon...'
+    roomdelete: '&cStarting to delete %room%...'
+    timetook: '&aFinished! Took %time%ms.'
+  others:
+    deletedungeon: '&cWarning, this command is intended to permanently delete the &4%dungeon%&c dungeon, this action cannot be undone. Please confirm your operation with the command &4/dungeon confirm&c.'
+    importdungeon: '&aA record of this dungeon appears to already exist. Would you want try to import it? Please confirm your operation with the command &b/dungeon confirm&a.'
+    renaming: '&aRenaming: Enter the new dungeon name. You will have 10 seconds to enter the new name.'
+    reload: '&aDungeons configs and messages reloaded!'
+    listtop: '&8------ &7[&bDungeons List&7] &8------'
+    listcontent: '&8- &b%dungeon% &8- &7%status%'
+    listbottom: '&8--------------------------'
+    liststatus:
+      loaded: '&aLoaded'
+      unloaded: '&7Unloaded'
+  help:
+    helptop: '&8------ &7[&bDungeons Commands&7] &8------'
+    helpcmd: '&8/&b%cmd% &8- &7%info%'
+    helpbottom: '&8-------------------------------'
+    info:
+      reload: 'Reload configuration and reload dungeons'
+      create: 'Create/Import a dungeon'
+      remove: 'Removes the dungeon from the configuration and keeps these files'
+      delete: 'Permanently deletes a dungeon including files'
+      edit: 'Configure properties of a dungeon or a room'
+      addroom: 'Creates a room for the specified dungeon'
+      setexit: 'Define the exit of the future room'
+      generate: 'Generates the specified dungeon depending on these properties'
+      list: 'Lists all created dungeons'
+      help: 'Display this help page'
+gui:
+  dungeongui:
+    title: '&aEditing &8- &e%dungeon%'
+    boolean:
+      true: '&atrue'
+      false: '&cfalse'
+#
+# To use material, see the SpigotAPI material section
+# https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+#
+    items:
+      rename:
+        name: '&aRename the dungeon'
+        lore:
+        - '&bChange the name of the dungeon'
+        - ''
+        - '&7Left click to rename the dungeon'
+        material: PAPER
+      roomcount:
+        name: '&aRoom count'
+        lore:
+        - '&bNumber of rooms to be generated'
+        - ''
+        - '&7Left click to &aincrease'
+        - '&7Right click to &cdecrease'
+        material: OAK_DOOR
+      roomrecyling:
+        name: '&aRoom recyling: %boolean%'
+        lore:
+        - '&bAllow/block re-using a room(s)'
+        - ''
+        - '&7Left click to toggle'
+        truematerial: LIME_WOOL
+        falsematerial: RED_WOOL
+      roomseparator:
+        name: '&r'
+        lore: null
+        material: BLACK_STAINED_GLASS_PANE
+      roomitem:
+        name: '&aRoom &e%int%'
+        lore:
+        - '&bEdit room properties'
+        - ''
+        - '&7Left click to enter the setup menu'
+        material: PISTON
+  roomgui:
+    title: '&aEditing &8- &e%room%'
+    items:
+      roomitem:
+        name: '&aRoom &e%int%'
+        lore:
+        - '&bEditing room properties'
+        - ''
+        - '&7Left click to go back'
+        material: PISTON
+      spawnrate:
+        name: '&aGeneration rate &e%int%%'
+        lore:
+        - '&bThe generation rate of the room'
+        material: DISPENSER
+      addspawnrate:
+        name: '&a+ &e%int%%'
+        lore:
+        - '&bIncreases the generation rate'
+        - ''
+        - '&7Left click to &aincrease'
+        material: LIME_STAINED_GLASS_PANE
+      lowerspawnrate:
+        name: '&c- &6%int%%'
+        lore:
+        - '&bDecreases the generation rate'
+        - ''
+        - '&7Left click to &cdecrease'
+        material: RED_STAINED_GLASS_PANE
+      delete:
+        name: '&cDelete the room'
+        lore:
+        - '&bDeletes the room’s corresponding files'
+        - '&cWarning! This action is permanent and &oirreversible'
+        - ''
+        - '&7Left click to &cdelete'
+        material: BARRIER
+  deletegui:
+    title: '&cAre you sure to delete &4%room%&c?'
+    items:
+      confirm:
+        name: '&aYes!'
+        lore:
+        - '&bThis action will permanently destroy this room.'
+        - ''
+        - '&7Left click to &aConfirm'
+        material: LIME_STAINED_GLASS_PANE
+      cancel:
+        name: '&cNo.'
+        lore:
+        - '&bKeep the room and do not delete anything'
+        - ''
+        - '&7Left click to &cCancel'
+        material: RED_STAINED_GLASS_PANE
