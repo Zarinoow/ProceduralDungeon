@@ -51,8 +51,8 @@ public class Main extends JavaPlugin {
 		getLogger().log(Level.INFO, ChatColor.DARK_GREEN + "Initializing...");
 		getLogger().log(Level.INFO, "");
 		getLogger().log(Level.INFO, ChatColor.DARK_GREEN + "Version " + getDescription().getVersion());
-		getLogger().log(Level.INFO, ChatColor.RED + "/!\\ Attention Pré-release /!\\");
-//		getLogger().log(Level.INFO, ChatColor.RED + "/!\\ Attention ReleaseCandidate /!\\");
+//		getLogger().log(Level.INFO, ChatColor.RED + "/!\\ Attention Pré-release /!\\");
+		getLogger().log(Level.INFO, ChatColor.RED + "/!\\ Attention ReleaseCandidate /!\\");
 		getLogger().log(Level.INFO, ChatColor.RED + "Ce build n'est pas terminée");
 		getLogger().log(Level.INFO, ChatColor.RED + "Il peut donc contenir des bugs");
 		getLogger().log(Level.INFO, "");
