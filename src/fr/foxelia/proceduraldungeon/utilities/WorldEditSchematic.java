@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;
@@ -14,6 +15,7 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
@@ -25,8 +27,13 @@ import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionSelector;
+import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.world.World;
 
 public class WorldEditSchematic {
 	
@@ -56,6 +63,7 @@ public class WorldEditSchematic {
 	public void pasteSchematic(Location loc) {
 		if(loadedSchematic == null) return;
 		try (EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(loc.getWorld()))) {
+			killEntities(loc);
 		    Operation operation = new ClipboardHolder(loadedSchematic)
 		            .createPaste(editSession)
 		            .to(BlockVector3.at(loc.getX(), loc.getY(), loc.getZ()))
@@ -106,6 +114,39 @@ public class WorldEditSchematic {
 			return;
 		}
 		return;
+	}
+	
+	private void killEntities(Location loc) {
+		Region killArea = getFutureSelection(loc);
+		if(killArea == null) return;
+		for(Entity entity : BukkitAdapter.adapt(loc.getWorld()).getEntities(killArea)) {
+			if(entity instanceof Player) continue;
+			entity.remove();
+		}		
+	}
+	
+	private Region getFutureSelection(Location loc) {
+		World world = BukkitAdapter.adapt(loc.getWorld());
+		
+		ClipboardHolder holder = new ClipboardHolder(loadedSchematic);
+        Clipboard clipboard = holder.getClipboard();
+        Region region = clipboard.getRegion();
+        
+        BlockVector3 to = BlockVector3.at(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());		
+		
+        
+		BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
+        Vector3 realTo = to.toVector3().add(holder.getTransform().apply(clipboardOffset.toVector3()));
+        Vector3 max = realTo.add(holder.getTransform().apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
+        RegionSelector selector = new CuboidRegionSelector(world, realTo.toBlockPoint(), max.toBlockPoint());
+        selector.learnChanges();
+        
+        try {
+			return selector.getRegion();
+		} catch (IncompleteRegionException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 }
