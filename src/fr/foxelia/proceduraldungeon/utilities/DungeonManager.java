@@ -110,13 +110,14 @@ public class DungeonManager {
 		spawnLoc.add(0, 0, -1);
 		Random rand = new Random();
 		List<Room> used = new ArrayList<>();
+		List<Room> masked = new ArrayList<>();
 		
 		for(int i = 0; i < dungeon.getConfig().getInt("roomcount"); i++) {
 			boolean roomfound = false;
 			Room roomchoosen = null;
 			do {
-				if(dungeon.getDungeonRooms().getRooms().size() <= 0) {
-					Main.getMain().getLogger().log(Level.SEVERE, "No generatable rooms left. Aborting.");
+				if(dungeon.getDungeonRooms().getRooms().size() <= 0 || masked.size() >= dungeon.getDungeonRooms().getRooms().size()) {
+					Main.getMain().getLogger().log(Level.SEVERE, "Unable to generate " + dungeon.getName() + ". No generatable rooms left. Aborting.");
 					return false;
 				}
 				if(used.size() >= dungeon.getDungeonRooms().getRooms().size()) used.clear();
@@ -129,7 +130,10 @@ public class DungeonManager {
 					dungeon.getDungeonRooms().getRooms().remove(roomchoosen);
 					continue;
 				}
-				if(roomchoosen.getSpawnrate() <= 0) used.add(roomchoosen);
+				if(roomchoosen.getSpawnrate() <= 0) {
+					used.add(roomchoosen);
+					if(!masked.contains(roomchoosen)) masked.add(roomchoosen);
+				}
 				choose = rand.nextInt(1, 101);
 				if(roomchoosen.getSpawnrate() >= choose) {
 					used.add(roomchoosen);
