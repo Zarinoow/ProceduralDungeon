@@ -25,9 +25,9 @@ ProceduralDungeon allows you to generate dungeons procedurally. That means, depe
 `()` are the optional arguments<br/>
 `folder` is the name of the dungeon folder<br/>
 `dungeon`is the name of one of the dojons imported<br/>
-`customname` is a custom name for the room (not customizable otherwise)
-`x`, `y`, `z` are the coordinates where the dungeon should appear in the front (You can use ~ for your position)
-`world` is the world in which it must be generated
+`customname` is a custom name for the room (not customizable otherwise)<br/>
+`x`, `y`, `z` are the coordinates where the dungeon should appear in the front (You can use ~ for your position)<br/>
+`world` is the world in which it must be generated<br/>
 
 # Know issue :
 - __Actually none__
