@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import com.sk89q.worldedit.EditSession;
@@ -73,6 +74,7 @@ public class WorldEditSchematic {
 		} catch (WorldEditException e) {
 			e.printStackTrace();
 		}
+		killAllItems(loc);
 	}
 	
 	public void saveSchematic(Location origin, LocalSession ps, File exportFile) {		
@@ -114,6 +116,14 @@ public class WorldEditSchematic {
 			return;
 		}
 		return;
+	}
+	
+	private void killAllItems(Location loc) {
+		Region killArea = getFutureSelection(loc);
+		if(killArea == null) return;
+		for(Entity entity : BukkitAdapter.adapt(loc.getWorld()).getEntities(killArea)) {
+			if(BukkitAdapter.adapt(entity.getState().getType()).equals(EntityType.DROPPED_ITEM)) entity.remove();
+		}
 	}
 	
 	private void killEntities(Location loc) {
