@@ -1,6 +1,13 @@
 # ProceduralDungeon
 ProceduralDungeon allows you to generate dungeons procedurally. That means, depending on the parameters entered and the pre-saved rooms, it generates a set of random rooms.
 
+<p align="center">
+  <a href="https://bstats.org/plugin/bukkit/ProceduralDungeon/13962">
+    Bstats page !
+  </a>
+</p>
+
+
 # Feature :
   - Register more than **36 rooms** (The first 36 rooms are configurable)
   - Can generate **one room** as **sixty-four** (Maximum theoretical value)
@@ -42,9 +49,16 @@ ProceduralDungeon allows you to generate dungeons procedurally. That means, depe
 # Installation Guide :
 1) Ensure you have the latest version of the game running on the server.
 2) Install the <a href="https://github.com/Zarinoow/ProceduralDungeon/releases/latest">latest<a/> version of plugin in the `/plugin` folder.
-3) Verify you have correctly installed <a href="https://dev.bukkit.org/projects/worldedit/files">WorldEdit<a/> or <a href="https://ci.athion.net/job/FastAsyncWorldEdit/">FastAsyncWorldEdit<a/>
+3) Verify you have correctly installed <a href="https://dev.bukkit.org/projects/worldedit/files">WorldEdit</a> or <a href="https://ci.athion.net/job/FastAsyncWorldEdit/">FastAsyncWorldEdit</a>
 4) Restart the server (**NOT RELOAD !**)
 5) Enjoy the plugin !
 
 # Get support :
 **Discord:** https://discord.gg/jbg6x8Buum
+
+# Terms of use
+- My plugin is public and free to use, please be respectful of my work.
+- The code of my plugin is open to anyone who is interested to learn more about programming. It is **under no circumstances tolerated to copy or steal my code** without my prior consent!
+- It is strictly forbidden to modify the source code of my plugin without my prior agreement.
+- I have no obligation to maintain this project, it is free and takes my own time, thank you for understanding.
+- Have fun using it!
