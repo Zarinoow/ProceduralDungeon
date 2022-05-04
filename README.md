@@ -1,7 +1,16 @@
+<p align="center">
+  <a href="https://github.com/Zarinoow/ProceduralDungeon">
+    <img src="Pdungeon.png" alt="ProceduralDungeon Logo" height="256">
+  </a>
+  <br/>
+  <sub>Logo Made By <a href="https://github.com/Zarinoow">Zarinoow</a></sub>
+</p>
+
 # ProceduralDungeon
 ProceduralDungeon allows you to generate dungeons procedurally. That means, depending on the parameters entered and the pre-saved rooms, it generates a set of random rooms.
 
 <p align="center">
+  <img src="pdungeonthumbnail.png" alt="ProceduralDungeon Dungeon" height="512">
   <a href="https://bstats.org/plugin/bukkit/ProceduralDungeon/13962">
     Bstats page !
   </a>
@@ -15,6 +24,9 @@ ProceduralDungeon allows you to generate dungeons procedurally. That means, depe
   - Choose if the plugin can **reuse rooms**
   - Generatable from the **user** or the **console** (Not configurable for the console)
   - **Configure** the dungeon or room as a **team**
+<p align="center">
+  <img src="pdungeonthumbnail_roomedit0.png" alt="ProceduralDungeon Edit" height="128">
+</p>
  
 # Permissions with their commands:
   - `proceduraldungeon.dungeon` <br/> Use the command `/dungeon` and `/dungeon help`
@@ -35,6 +47,10 @@ ProceduralDungeon allows you to generate dungeons procedurally. That means, depe
 `customname` is a custom name for the room (not customizable otherwise)<br/>
 `x`, `y`, `z` are the coordinates where the dungeon should appear in the front (You can use ~ for your position)<br/>
 `world` is the world in which it must be generated<br/>
+
+<p align="center">
+  <img src="pdungeonthumbnail_roomgen0.png" alt="ProceduralDungeon Gen" height="512">
+</p>
 
 # Know issue :
 - __Actually none__
