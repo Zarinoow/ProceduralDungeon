@@ -37,6 +37,7 @@ ProceduralDungeon allows you to generate dungeons procedurally. That means, depe
   - Generation of labyrinth rooms (not a straight line)
   - Final room with random rewards
   - Automated generation
+  - Increases the 36 rooms limit
 
 # Installation Guide :
 1) Ensure you have the latest version of the game running on the server.
