@@ -32,5 +32,18 @@ ProceduralDungeon allows you to generate dungeons procedurally. That means, depe
 # Know issue :
 - __Actually none__
 
+# Idea for future updates :
+  - Skript Implementation
+  - Generation of labyrinth rooms (not a straight line)
+  - Final room with random rewards
+  - Automated generation
+
+# Installation Guide :
+1) Ensure you have the latest version of the game running on the server.
+2) Install the <a href="https://github.com/Zarinoow/ProceduralDungeon/releases/latest">latest<a/> version of plugin in the `/plugin` folder.
+3) Verify you have correctly installed <a href="https://dev.bukkit.org/projects/worldedit/files">WorldEdit<a/> or <a href="https://ci.athion.net/job/FastAsyncWorldEdit/">FastAsyncWorldEdit<a/>
+4) Restart the server (**NOT RELOAD !**)
+5) Enjoy the plugin !
+
 # Get support :
 **Discord:** https://discord.gg/jbg6x8Buum
