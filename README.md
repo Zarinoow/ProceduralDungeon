@@ -10,7 +10,7 @@
 ProceduralDungeon allows you to generate dungeons procedurally. That means, depending on the parameters entered and the pre-saved rooms, it generates a set of random rooms.
 
 <p align="center">
-  <img src="pdungeonthumbnail.png" alt="ProceduralDungeon Dungeon" height="512">
+  <img src="pdungeonthumbnail.png" alt="ProceduralDungeon Dungeon">
   <a href="https://bstats.org/plugin/bukkit/ProceduralDungeon/13962">
     Bstats page !
   </a>
@@ -49,7 +49,7 @@ ProceduralDungeon allows you to generate dungeons procedurally. That means, depe
 `world` is the world in which it must be generated<br/>
 
 <p align="center">
-  <img src="pdungeonthumbnail_roomgen0.png" alt="ProceduralDungeon Gen" height="512">
+  <img src="pdungeonthumbnail_roomgen0.png" alt="ProceduralDungeon Gen">
 </p>
 
 # Know issue :
