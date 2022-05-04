@@ -69,6 +69,9 @@ ProceduralDungeon allows you to generate dungeons procedurally. That means, depe
 4) Restart the server (**NOT RELOAD !**)
 5) Enjoy the plugin !
 
+# Server using ProceduralDungeon
+- 🇫🇷 play.foxelia.fr French Survival Server (Serveur Survie Français)
+
 # Get support :
 **Discord:** https://discord.gg/jbg6x8Buum
 
