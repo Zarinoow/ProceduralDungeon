@@ -4,3 +4,27 @@ description: Generate some dungeon with random rooms
 authors: [Zarinoow]
 main: fr.foxelia.proceduraldungeon.Main
 depend: [WorldEdit]
+api-version : 1.18
+commands:
+  dungeon:
+    description: Dungeon command.
+    permission: proceduraldungeon.dungeon
+permissions:
+  proceduraldungeon.admin.reload:
+    default: op
+  proceduraldungeon.admin.create:
+    default: op
+  proceduraldungeon.admin.remove:
+    default: op
+  proceduraldungeon.admin.delete:
+    default: op
+  proceduraldungeon.admin.addroom:
+    default: op
+  proceduraldungeon.admin.generate:
+    default: op
+  proceduraldungeon.admin.edit:
+    default: op
+  proceduraldungeon.admin.edit.deleteroom:
+    default: op
+  proceduraldungeon.admin.list:
+    default: op
