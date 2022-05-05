@@ -2,6 +2,7 @@ messages:
   errors:
     alreadyexist: '&c[Error] The dungeon %dungeon% already exist!' 
     doesnotexist: '&c[Error] The dungeon %dungeon% doesn’t exist!'
+    roomnotexist: '&c[Error] The dungeon room #%room% doesn’t exist!'
     duplicatename: '&c[Error] Unable to load folder &4%folder%&c, another dungeon with this name is already in use. This dungeon is no longer loaded. You can re-import it with the command &4/dungeon create %folder%&c.'
     exitnotset: '&c[Error] Firstly, you need to define an exit before being able to add a room. Use &4/dungeon setexit&c.'
     exitincorectlocation: '&c[Error] The exit can only be defined on the north side of the selection (&4Z= %z%&c needed).'
