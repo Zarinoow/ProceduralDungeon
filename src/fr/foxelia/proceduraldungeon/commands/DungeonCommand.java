@@ -88,7 +88,7 @@ public class DungeonCommand implements CommandExecutor {
 				}
 				if(sender.hasPermission("proceduraldungeon.admin.edit") && isPlayer) {
 					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getHelpMessage("helpcmd")
-							.replace("%cmd%", "dungeon edit {dungeonname}")
+							.replace("%cmd%", "dungeon edit {dungeonname} (roomnumber)")
 							.replace("%info%", Main.getHelpMessage("info.edit"))));
 				}
 				if(sender.hasPermission("proceduraldungeon.admin.addroom") && isPlayer) {
@@ -413,7 +413,7 @@ public class DungeonCommand implements CommandExecutor {
 					return false;					
 				}
 				
-				if(args.length >= 2) {
+				if(args.length == 2) {
 					Player p = (Player) sender;
 					
 					if(!Main.getDungeons().containsKey(args[1].toLowerCase())) {
@@ -433,6 +433,21 @@ public class DungeonCommand implements CommandExecutor {
 					GUI gui = new GUIManager().createDungeonGUI(dungeon);
 					Main.getGUIs().add(gui);
 					p.openInventory(gui.getInventory());
+					return true;
+				} 
+				if (args.length >= 3) {
+					Player p = (Player) sender;
+					
+					DungeonManager dungeon = Main.getDungeons().get(args[1].toLowerCase());
+					try {
+					GUI gui = new GUIManager().createDungeonGUI(dungeon);
+					Room room = gui.getDungeon().getDungeonRooms().getRooms().get(Integer.valueOf(args[2]));
+					GUI newgui = new GUIManager().createRoomGUI(gui.getDungeon(), room);
+					Main.getGUIs().add(newgui);
+					p.openInventory(newgui.getInventory());
+					} catch(IndexOutOfBoundsException | NumberFormatException e) {
+						p.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("roomnotexist").replace("%room%", args[2])));
+					}
 					return true;
 				}
 /*
