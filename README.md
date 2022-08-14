@@ -61,6 +61,7 @@ ProceduralDungeon allows you to generate dungeons procedurally. That means, depe
   - Final room with random rewards
   - Automated generation
   - Increases the 36 rooms limit
+  - Support of MythicsMobs
 
 # Installation Guide :
 1) Ensure you have the latest version of the game running on the server.
@@ -70,7 +71,7 @@ ProceduralDungeon allows you to generate dungeons procedurally. That means, depe
 5) Enjoy the plugin !
 
 # Server using ProceduralDungeon
-- 🇫🇷 play.foxelia.fr French Survival Server (Serveur Survie Français)
+- None
 
 # Get support :
 **Discord:** https://discord.gg/jbg6x8Buum
