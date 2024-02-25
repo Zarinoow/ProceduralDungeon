@@ -46,7 +46,7 @@ ProceduralDungeon allows you to generate dungeons procedurally. That means, depe
 `folder` is the name of the dungeon folder<br/>
 `dungeon`is the name of one of the dungeons imported<br/>
 `customname` is a custom name for the room (not customizable otherwise)<br/>
-`roomnumber` is the room identifier (Note: is updated automatically)
+`roomnumber` is the room identifier (Note: is updated automatically)<br/>
 `x`, `y`, `z` are the coordinates where the dungeon should appear in the front (You can use ~ for your position)<br/>
 `world` is the world in which it must be generated<br/>
 
