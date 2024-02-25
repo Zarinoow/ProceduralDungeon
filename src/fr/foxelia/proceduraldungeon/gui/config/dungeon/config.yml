@@ -1,0 +1,68 @@
+# Title placeholders :
+# %page% - Current page
+# %maxpage% - Max page
+# %dungeon% - Dungeon name
+title: '&8(%page%/%maxpage%) &aEditing &8- &e%dungeon%'
+#
+# To use material, see the SpigotAPI material section
+# https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+#
+items:
+  empty:
+    name: '&r'
+    material: GRAY_STAINED_GLASS_PANE
+  navbar:
+    next:
+      name: '&aNext page'
+      lore:
+        - '&bGo to the next page'
+        - ''
+        - '&7Left click to go to the next page'
+      material: ARROW
+    previous:
+      name: '&aPrevious page'
+      lore:
+         - '&bGo to the previous page'
+         - ''
+         - '&7Left click to go to the previous page'
+      material: ARROW
+    rename:
+      name: '&aRename the dungeon'
+      lore:
+        - '&bChange the name of the dungeon'
+        - ''
+        - '&7Left click to rename the dungeon'
+      material: PAPER
+    roomcount:
+      name: '&aRoom count'
+      lore:
+        - '&bNumber of rooms to be generated'
+        - ''
+        - '&7Left click to &aincrease'
+        - '&7Right click to &cdecrease'
+      material: OAK_DOOR
+    roomrecyling:
+      rtrue:
+        name: '&aRoom recyling: &atrue'
+        lore:
+          - '&bAllow/block re-using a room(s)'
+          - ''
+          - '&7Left click to toggle'
+        material: LIME_WOOL
+      rfalse:
+        name: '&aRoom recyling: &cfalse'
+        lore:
+          - '&bAllow/block re-using a room(s)'
+          - ''
+          - '&7Left click to toggle'
+        material: RED_WOOL
+  roomitem:
+    # Placeholders:
+    # %number% - Room number
+    # %room% - Room file name
+    name: '&aRoom &e%number%'
+    lore:
+      - '&bEdit room properties'
+      - ''
+      - '&7Left click to enter the setup menu'
+    material: PISTON

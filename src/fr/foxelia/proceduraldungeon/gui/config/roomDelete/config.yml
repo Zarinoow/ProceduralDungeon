@@ -1,0 +1,22 @@
+# Usable placeholders on title and items :
+# %room% - The room name
+# %number% - The room number
+title: '&cAre you sure to delete &4%room%&c?'
+items:
+  empty:
+    name: '&r'
+    material: GRAY_STAINED_GLASS_PANE
+  confirm:
+    name: '&aYes!'
+    lore:
+      - '&bThis action will permanently destroy this room.'
+      - ''
+      - '&7Left click to &aConfirm'
+    material: LIME_STAINED_GLASS_PANE
+  cancel:
+    name: '&cNo.'
+    lore:
+      - '&bKeep the room and do not delete anything'
+      - ''
+      - '&7Left click to &cCancel'
+    material: RED_STAINED_GLASS_PANE

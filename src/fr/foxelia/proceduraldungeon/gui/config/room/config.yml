@@ -1,0 +1,42 @@
+# Usable placeholders on title and items :
+# %room% - The room name
+# %number% - The room number
+title: '&aEditing &8- &e%room%'
+items:
+  empty:
+    name: '&r'
+    material: GRAY_STAINED_GLASS_PANE
+  roomitem:
+    name: '&aRoom &e%number%'
+    lore:
+      - '&bEditing room properties'
+      - ''
+      - '&7Left click to go back'
+    material: PISTON
+  spawnrate:
+    name: '&aGeneration rate &e%rate%%'
+    lore:
+      - '&bThe generation rate of the room'
+    material: DISPENSER
+  addspawnrate:
+    name: '&a+ &e%ratemodifier%%'
+    lore:
+      - '&bIncreases the generation rate'
+      - ''
+      - '&7Left click to &aincrease'
+    material: LIME_STAINED_GLASS_PANE
+  lowerspawnrate:
+    name: '&c- &6%ratemodifier%%'
+    lore:
+      - '&bDecreases the generation rate'
+      - ''
+      - '&7Left click to &cdecrease'
+    material: RED_STAINED_GLASS_PANE
+  delete:
+    name: '&cDelete the room'
+    lore:
+      - '&bDeletes the room’s corresponding files'
+      - '&cWarning! This action is permanent and &oirreversible'
+      - ''
+      - '&7Left click to &cdelete'
+    material: BARRIER
