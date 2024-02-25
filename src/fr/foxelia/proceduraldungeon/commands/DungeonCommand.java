@@ -1,33 +1,13 @@
 package fr.foxelia.proceduraldungeon.commands;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.management.InstanceAlreadyExistsException;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-
 import fr.foxelia.proceduraldungeon.Main;
-import fr.foxelia.proceduraldungeon.gui.GUI;
 import fr.foxelia.proceduraldungeon.gui.GUIManager;
-import fr.foxelia.proceduraldungeon.gui.GUIType;
 import fr.foxelia.proceduraldungeon.utilities.ActionType;
 import fr.foxelia.proceduraldungeon.utilities.DungeonManager;
 import fr.foxelia.proceduraldungeon.utilities.Pair;
@@ -35,6 +15,22 @@ import fr.foxelia.proceduraldungeon.utilities.WorldEditSchematic;
 import fr.foxelia.proceduraldungeon.utilities.rooms.Coordinate;
 import fr.foxelia.proceduraldungeon.utilities.rooms.Room;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
+
+import javax.management.InstanceAlreadyExistsException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DungeonCommand implements CommandExecutor {
 
@@ -281,13 +277,14 @@ public class DungeonCommand implements CommandExecutor {
 						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("doesnotexist").replace("%dungeon%", confirm.getSecond())));
 						return false;
 					}
-					
+
 					try {
 						DungeonManager dm = Main.getDungeons().get(confirm.getSecond().toLowerCase());
+						List<HumanEntity> closed = GUIManager.closeAllGUIOf(dm);
 						Main.getDungeons().remove(confirm.getSecond().toLowerCase());
 						Main.saveDungeons();
-						this.delete(dm.getDungeonFolder());
-						
+						delete(dm.getDungeonFolder());
+						closed.forEach(human -> human.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getOthersMessage("dungeondeleted"))));
 					} catch (Exception e) {
 						e.printStackTrace();
 						Main.sendInternalError(sender);
@@ -373,6 +370,8 @@ public class DungeonCommand implements CommandExecutor {
 					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getSuccessMessage("roomadded")
 							.replace("%dungeon%", dungeon.getName())
 							.replace("%file%", roomFile.getName())));
+
+					GUIManager.reopenDungeonGUI(dungeon);
 					return true;
 				}
 // Set Exit
@@ -420,19 +419,8 @@ public class DungeonCommand implements CommandExecutor {
 						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("doesnotexist").replace("%dungeon%", args[1])));
 						return false;
 					}
-					
-					DungeonManager dungeon = Main.getDungeons().get(args[1].toLowerCase());
-					
-					for(GUI gui : Main.getGUIs()) {
-						if(gui.getDungeon().equals(dungeon) && gui.getType().equals(GUIType.DUNGEON)) {
-							p.openInventory(gui.getInventory());
-							return true;
-						}
-					}
-					
-					GUI gui = new GUIManager().createDungeonGUI(dungeon);
-					Main.getGUIs().add(gui);
-					p.openInventory(gui.getInventory());
+
+					GUIManager.openDungeonGUI(Main.getDungeons().get(args[1].toLowerCase()), p);
 					return true;
 				} 
 				if (args.length >= 3) {
@@ -440,11 +428,8 @@ public class DungeonCommand implements CommandExecutor {
 					
 					DungeonManager dungeon = Main.getDungeons().get(args[1].toLowerCase());
 					try {
-					GUI gui = new GUIManager().createDungeonGUI(dungeon);
-					Room room = gui.getDungeon().getDungeonRooms().getRooms().get(Integer.valueOf(args[2]));
-					GUI newgui = new GUIManager().createRoomGUI(gui.getDungeon(), room);
-					Main.getGUIs().add(newgui);
-					p.openInventory(newgui.getInventory());
+						Room room = dungeon.getDungeonRooms().getRooms().get(Integer.valueOf(args[2]));
+						GUIManager.openRoomGUI(dungeon, room, p);
 					} catch(IndexOutOfBoundsException | NumberFormatException e) {
 						p.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("roomnotexist").replace("%room%", args[2])));
 					}

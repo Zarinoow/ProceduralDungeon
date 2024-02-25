@@ -1,266 +1,195 @@
 package fr.foxelia.proceduraldungeon.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
 import fr.foxelia.proceduraldungeon.Main;
 import fr.foxelia.proceduraldungeon.utilities.DungeonManager;
 import fr.foxelia.proceduraldungeon.utilities.rooms.Room;
+import fr.foxelia.tools.minecraft.ui.gui.GUI;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.entity.HumanEntity;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GUIManager {
-	
-	private Inventory inventory;
-	
-	public GUI createDungeonGUI(DungeonManager dungeon) {
-		inventory = Bukkit.createInventory(
-				null,
-				6*9,
-				ChatColor.translateAlternateColorCodes('&', Main.getGUIString("dungeongui.title")
-						.replace("%dungeon%", dungeon.getName())));
-		
-// Rename
-		try {
-			inventory.setItem(2, constructItem(
-					Material.valueOf(Main.getGUIString("dungeongui.items.rename.material")),
-					1,
-					Main.getGUIString("dungeongui.items.rename.name"),
-					Main.getGuiStringList("dungeongui.items.rename.lore")));
-		} catch (IllegalArgumentException exception) {
-			Main.getMain().getLogger().log(Level.WARNING, "Invalid material " + Main.getGUIString("dungeongui.items.rename.material") + " in the rename section. Attempt to retrieve the default value...");
-			inventory.setItem(2, constructItem(Material.PAPER, 1, Main.getGUIString("dungeongui.items.rename.name"), Main.getGuiStringList("dungeongui.items.rename.lore")));
+
+	private static final Map<DungeonManager, List<DungeonGUI>> dungeonGUIs = new HashMap<>();
+	private static final Map<Room, RoomGUI> roomGUIs = new HashMap<>();
+	private static final Map<Room, RoomDeleteGUI> roomDeleteGUIs = new HashMap<>();
+
+	/*
+	 * Security methods
+	 */
+
+	/**
+	 * Check if player can interact with the GUI and send a message if not
+	 * @param player Player to check
+	 * @return true if player has permission to edit
+	 */
+	public static boolean checkPermissionToEdit(HumanEntity player) {
+		boolean hasPermission = player.hasPermission("proceduraldungeon.admin.edit");
+		if(!hasPermission) {
+			player.sendMessage(ChatColor.translateAlternateColorCodes('&', Main.getErrorMessage("lackingpermission").replace("%permission%", "proceduraldungeon.admin.edit")));
+		}
+		return hasPermission;
+	}
+
+	/**
+	 * Check if the dungeon still exists and close the inventory if not
+	 * @param gui GUI to check
+	 * @param dungeon Dungeon to check
+	 * @return true if dungeon exists
+	 */
+	public static boolean checkDungeonExists(GUI gui, DungeonManager dungeon) {
+		boolean exists = dungeon.getDungeonFolder().exists();
+		if(!exists) {
+			gui.closeInventory();
+		}
+		return exists;
+	}
+
+	/**
+	 * Check if the room still exists and close the inventory if not
+	 * @param gui GUI to check
+	 * @param room Room to check
+	 * @return true if room exists
+	 */
+	public static boolean checkRoomExists(GUI gui, Room room) {
+		boolean exists = room.getFile().exists();
+		if(!exists) {
+			gui.closeInventory();
+		}
+		return exists;
+	}
+
+	/*
+	 * GUI Opening
+	 */
+
+	public static DungeonGUI openDungeonGUI(DungeonManager dungeon, HumanEntity player) {
+		DungeonGUI gui = new DungeonGUI(dungeon);
+		gui.openInventory(player);
+		addDungeonGUI(dungeon, gui);
+		return gui;
+	}
+
+	public static void openRoomGUI(DungeonManager dungeon, Room room, HumanEntity player) {
+		if(roomGUIs.containsKey(room)) {
+			player.openInventory(roomGUIs.get(room).getInventory());
+		} else {
+			RoomGUI gui = new RoomGUI(dungeon, room);
+			gui.openInventory(player);
+			roomGUIs.put(room, gui);
+		}
+	}
+
+	public static void openRoomDeleteGUI(DungeonManager dungeon, Room room, HumanEntity player) {
+		if(roomDeleteGUIs.containsKey(room)) {
+			player.openInventory(roomDeleteGUIs.get(room).getInventory());
+		} else {
+			RoomDeleteGUI gui = new RoomDeleteGUI(dungeon, room);
+			gui.openInventory(player);
+			roomDeleteGUIs.put(room, gui);
+		}
+	}
+
+	/*
+	 * GUI Closing
+	 */
+
+	public static List<HumanEntity> closeAllRoomGUIOf(Room room) {
+		List<HumanEntity> closed = new ArrayList<>();
+		if(roomGUIs.containsKey(room)) {
+			RoomGUI gui = roomGUIs.get(room);
+			closed.addAll(gui.getInventory().getViewers());
+			gui.closeInventory();
+		}
+		if(roomDeleteGUIs.containsKey(room)) {
+			RoomDeleteGUI gui = roomDeleteGUIs.get(room);
+			closed.addAll(gui.getInventory().getViewers());
+			gui.closeInventory();
 		}
 
-// RoomCount
-		try {
-			inventory.setItem(4, constructItem(
-					Material.valueOf(Main.getGUIString("dungeongui.items.roomcount.material")),
-					dungeon.getConfig().getInt("roomcount"),
-					Main.getGUIString("dungeongui.items.roomcount.name"),
-					Main.getGuiStringList("dungeongui.items.roomcount.lore")));
-		} catch (IllegalArgumentException exception) {
-			Main.getMain().getLogger().log(Level.WARNING, "Invalid material " + Main.getGUIString("dungeongui.items.roomcount.material") + " in the roomcount section. Attempt to retrieve the default value...");
-			inventory.setItem(4, constructItem(Material.OAK_DOOR, dungeon.getConfig().getInt("roomcount"), Main.getGUIString("dungeongui.items.roomcount.name"), Main.getGuiStringList("dungeongui.items.roomcount.lore")));
-		}
-		
-// RoomRecyling
-		try {
-			if(dungeon.getConfig().getBoolean("roomrecyling")) {
-				inventory.setItem(6, constructItem(
-						Material.valueOf(Main.getGUIString("dungeongui.items.roomrecyling.truematerial")),
-						1,
-						Main.getGUIString("dungeongui.items.roomrecyling.name").replace("%boolean%", Main.getGUIString("dungeongui.boolean.true")),
-						Main.getGuiStringList("dungeongui.items.roomrecyling.lore")));
-			} else {
-				inventory.setItem(6, constructItem(
-						Material.valueOf(Main.getGUIString("dungeongui.items.roomrecyling.falsematerial")),
-						1,
-						Main.getGUIString("dungeongui.items.roomrecyling.name").replace("%boolean%", Main.getGUIString("dungeongui.boolean.false")),
-						Main.getGuiStringList("dungeongui.items.roomrecyling.lore")));
-			}
-			
-		} catch (IllegalArgumentException exception) {
-			if(dungeon.getConfig().getBoolean("roomrecyling")) {
-				Main.getMain().getLogger().log(Level.WARNING, "Invalid material " + Main.getGUIString("dungeongui.items.roomrecyling.truematerial") + " in the roomrecyling section. Attempt to retrieve the default value...");
-				inventory.setItem(6, constructItem(
-						Material.LIME_WOOL,
-						1,
-						Main.getGUIString("dungeongui.items.roomrecyling.name").replace("%boolean%", Main.getGUIString("dungeongui.boolean.true")),
-						Main.getGuiStringList("dungeongui.items.roomrecyling.lore")));
-			} else {
-				Main.getMain().getLogger().log(Level.WARNING, "Invalid material " + Main.getGUIString("dungeongui.items.roomrecyling.falsematerial") + " in the roomrecyling section. Attempt to retrieve the default value...");
-				inventory.setItem(6, constructItem(
-						Material.RED_WOOL,
-						1,
-						Main.getGUIString("dungeongui.items.roomrecyling.name").replace("%boolean%", Main.getGUIString("dungeongui.boolean.false")),
-						Main.getGuiStringList("dungeongui.items.roomrecyling.lore")));
-			}
-		}
-		
-// RoomSeparator
-		try {
-			for(int slot = 9; slot <= 17; slot++) {
-				inventory.setItem(slot, constructItem(
-						Material.valueOf(Main.getGUIString("dungeongui.items.roomseparator.material")),
-						1,
-						Main.getGUIString("dungeongui.items.roomseparator.name"),
-						Main.getGuiStringList("dungeongui.items.roomseparator.lore")));
-			}
-		} catch (IllegalArgumentException exception) {
-			Main.getMain().getLogger().log(Level.WARNING, "Invalid material " + Main.getGUIString("dungeongui.items.roomseparator.material") + " in the roomseparator section. Attempt to retrieve the default value...");
-			for(int slot = 9; slot <= 17; slot++) {
-				inventory.setItem(slot, constructItem(
-						Material.BLACK_STAINED_GLASS_PANE,
-						1,
-						Main.getGUIString("dungeongui.items.roomseparator.name"),
-						Main.getGuiStringList("dungeongui.items.roomseparator.lore")));
-			}
-		}
-		
-// RoomItem
-		try {
-			int roomcount = dungeon.getDungeonRooms().getRooms().size() + 18;
-			for(int slot = 18; slot <= 53; slot++) {
-				if(slot == roomcount) break;
-				inventory.setItem(slot, constructItem(
-						Material.valueOf(Main.getGUIString("dungeongui.items.roomitem.material")),
-						1,
-						Main.getGUIString("dungeongui.items.roomitem.name").replace("%int%", String.valueOf(slot - 18)),
-						Main.getGuiStringList("dungeongui.items.roomitem.lore")));
-			}
-		} catch (IllegalArgumentException exception) {
-			Main.getMain().getLogger().log(Level.WARNING, "Invalid material " + Main.getGUIString("dungeongui.items.roomitem.material") + " in the roomitem section. Attempt to retrieve the default value...");
-			int roomcount = dungeon.getDungeonRooms().getRooms().size() + 18;
-			for(int slot = 18; slot <= 53; slot++) {
-				if(slot == roomcount) break;
-				inventory.setItem(slot, constructItem(
-						Material.PISTON,
-						1,
-						Main.getGUIString("dungeongui.items.roomitem.name").replace("%int%", String.valueOf(slot - 18)),
-						Main.getGuiStringList("dungeongui.items.roomitem.lore")));
-			}
-		}
-		
-		return new GUI(inventory, dungeon, null, false);
+		return closed;
 	}
-	
-	public GUI createRoomGUI(DungeonManager dungeon, Room room) {
-		inventory = Bukkit.createInventory(
-				null,
-				3*9,
-				ChatColor.translateAlternateColorCodes('&', Main.getGUIString("roomgui.title")
-						.replace("%room%", room.getFile().getName().replace(".dungeon", ""))));
-		
-// Icon
-		try {
-			inventory.setItem(0, constructItem(
-					Material.valueOf(Main.getGUIString("roomgui.items.roomitem.material")),
-					1,
-					Main.getGUIString("roomgui.items.roomitem.name").replace("%int%", String.valueOf(dungeon.getDungeonRooms().getRooms().indexOf(room))),
-					Main.getGuiStringList("roomgui.items.roomitem.lore")));
-		} catch (IllegalArgumentException exception) {
-			Main.getMain().getLogger().log(Level.WARNING, "Invalid material " + Main.getGUIString("roomgui.items.roomitem.material") + " in the roomitem section. Attempt to retrieve the default value...");
-			inventory.setItem(0, constructItem(Material.PISTON, 1, Main.getGUIString("roomgui.items.roomitem.name").replace("%int%", String.valueOf(dungeon.getDungeonRooms().getRooms().indexOf(room))), Main.getGuiStringList("roomgui.items.roomitem.lore")));
+
+	public static List<HumanEntity> closeAllGUIOf(DungeonManager dungeon) {
+		List<HumanEntity> closed = new ArrayList<>();
+		for(Room room : dungeon.getDungeonRooms().getRooms()) {
+			closed.addAll(closeAllRoomGUIOf(room));
 		}
-		
-// SpawnRate Icon
-		try {
-			inventory.setItem(4, constructItem(
-					Material.valueOf(Main.getGUIString("roomgui.items.spawnrate.material")),
-					1,
-					Main.getGUIString("roomgui.items.spawnrate.name").replace("%int%", String.valueOf(room.getSpawnrate())),
-					Main.getGuiStringList("roomgui.items.spawnrate.lore")));
-		} catch (IllegalArgumentException exception) {
-			Main.getMain().getLogger().log(Level.WARNING, "Invalid material " + Main.getGUIString("roomgui.items.spawnrate.material") + " in the spawnrate section. Attempt to retrieve the default value...");
-			inventory.setItem(4, constructItem(Material.DISPENSER, 1, Main.getGUIString("roomgui.items.spawnrate.name").replace("%int%", String.valueOf(room.getSpawnrate())), Main.getGuiStringList("roomgui.items.spawnrate.lore")));
-		}
-		
-// Add SpawnRate
-		try {
-			inventory.setItem(12, constructItem(
-					Material.valueOf(Main.getGUIString("roomgui.items.addspawnrate.material")),
-					1,
-					Main.getGUIString("roomgui.items.addspawnrate.name").replace("%int%", "1"),
-					Main.getGuiStringList("roomgui.items.addspawnrate.lore")));
-			inventory.setItem(21, constructItem(
-					Material.valueOf(Main.getGUIString("roomgui.items.addspawnrate.material")),
-					1,
-					Main.getGUIString("roomgui.items.addspawnrate.name").replace("%int%", "10"),
-					Main.getGuiStringList("roomgui.items.addspawnrate.lore")));
-		} catch (IllegalArgumentException exception) {
-			Main.getMain().getLogger().log(Level.WARNING, "Invalid material " + Main.getGUIString("roomgui.items.addspawnrate.material") + " in the addspawnrate section. Attempt to retrieve the default value...");
-			inventory.setItem(12, constructItem(Material.LIME_STAINED_GLASS_PANE, 1, Main.getGUIString("roomgui.items.addspawnrate.name").replace("%int%", "1"), Main.getGuiStringList("roomgui.items.addspawnrate.lore")));
-			inventory.setItem(21, constructItem(Material.LIME_STAINED_GLASS_PANE, 1, Main.getGUIString("roomgui.items.addspawnrate.name").replace("%int%", "10"), Main.getGuiStringList("roomgui.items.addspawnrate.lore")));
-		}
-		
-// Lower SpawnRate
-		try {
-			inventory.setItem(14, constructItem(
-					Material.valueOf(Main.getGUIString("roomgui.items.lowerspawnrate.material")),
-					1,
-					Main.getGUIString("roomgui.items.lowerspawnrate.name").replace("%int%", "1"),
-					Main.getGuiStringList("roomgui.items.lowerspawnrate.lore")));
-			inventory.setItem(23, constructItem(
-					Material.valueOf(Main.getGUIString("roomgui.items.lowerspawnrate.material")),
-					1,
-					Main.getGUIString("roomgui.items.lowerspawnrate.name").replace("%int%", "10"),
-					Main.getGuiStringList("roomgui.items.lowerspawnrate.lore")));
-		} catch (IllegalArgumentException exception) {
-			Main.getMain().getLogger().log(Level.WARNING, "Invalid material " + Main.getGUIString("roomgui.items.lowerspawnrate.material") + " in the lowerspawnrate section. Attempt to retrieve the default value...");
-			inventory.setItem(14, constructItem(Material.RED_STAINED_GLASS_PANE, 1, Main.getGUIString("roomgui.items.lowerspawnrate.name").replace("%int%", "1"), Main.getGuiStringList("roomgui.items.lowerspawnrate.lore")));
-			inventory.setItem(23, constructItem(Material.RED_STAINED_GLASS_PANE, 1, Main.getGUIString("roomgui.items.lowerspawnrate.name").replace("%int%", "10"), Main.getGuiStringList("roomgui.items.lowerspawnrate.lore")));
-		}
-		
-// Delete
-		try {
-			inventory.setItem(8, constructItem(
-					Material.valueOf(Main.getGUIString("roomgui.items.delete.material")),
-					1,
-					Main.getGUIString("roomgui.items.delete.name"),
-					Main.getGuiStringList("roomgui.items.delete.lore")));
-		} catch (IllegalArgumentException exception) {
-			Main.getMain().getLogger().log(Level.WARNING, "Invalid material " + Main.getGUIString("roomgui.items.delete.material") + " in the delete section. Attempt to retrieve the default value...");
-			inventory.setItem(8, constructItem(Material.BARRIER, 1, Main.getGUIString("roomgui.items.delete.name"), Main.getGuiStringList("roomgui.items.delete.lore")));
-		}
-		
-		return new GUI(inventory, dungeon, room, false);
-	}
-	
-	public GUI createRoomDeleteGUI(DungeonManager dungeon, Room room) {
-		inventory = Bukkit.createInventory(
-				null,
-				9,
-				ChatColor.translateAlternateColorCodes('&', Main.getGUIString("deletegui.title")
-						.replace("%room%", room.getFile().getName().replace(".dungeon", ""))));
-		
-// Confirm
-		try {
-			inventory.setItem(3, constructItem(
-					Material.valueOf(Main.getGUIString("deletegui.items.confirm.material")),
-					1,
-					Main.getGUIString("deletegui.items.confirm.name"),
-					Main.getGuiStringList("deletegui.items.confirm.lore")));
-		} catch (IllegalArgumentException exception) {
-			Main.getMain().getLogger().log(Level.WARNING, "Invalid material " + Main.getGUIString("deletegui.items.confirm.material") + " in the confirm section. Attempt to retrieve the default value...");
-			inventory.setItem(3, constructItem(Material.LIME_STAINED_GLASS_PANE, 1, Main.getGUIString("deletegui.items.confirm.name"), Main.getGuiStringList("deletegui.items.confirm.lore")));
-		}
-		
-// Cancel
-		try {
-			inventory.setItem(5, constructItem(
-					Material.valueOf(Main.getGUIString("deletegui.items.cancel.material")),
-					1,
-					Main.getGUIString("deletegui.items.cancel.name"),
-					Main.getGuiStringList("deletegui.items.cancel.lore")));
-		} catch (IllegalArgumentException exception) {
-			Main.getMain().getLogger().log(Level.WARNING, "Invalid material " + Main.getGUIString("deletegui.items.cancel.material") + " in the cancel section. Attempt to retrieve the default value...");
-			inventory.setItem(5, constructItem(Material.RED_STAINED_GLASS_PANE, 1, Main.getGUIString("deletegui.items.cancel.name"), Main.getGuiStringList("deletegui.items.cancel.lore")));
-		}
-		
-		return new GUI(inventory, dungeon, room, true);
-	}
-	
-	private ItemStack constructItem(Material material, int amount, String customName, List<String> lore) {
-		ItemStack item = new ItemStack(material, amount);
-		ItemMeta meta = item.getItemMeta();
-		if(customName != null) meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', customName));
-		if(lore != null) {
-			List<String> newLore = new ArrayList<String>();
-			for(String str : lore) {
-				newLore.add(ChatColor.translateAlternateColorCodes('&', str));
+		if(dungeonGUIs.containsKey(dungeon)) {
+			for(DungeonGUI gui : new ArrayList<>(dungeonGUIs.get(dungeon))) {
+				closed.addAll(gui.getInventory().getViewers());
+				gui.closeInventory();
 			}
-			meta.setLore(newLore);
 		}
-		
-		item.setItemMeta(meta);
-		return item;
+		return closed;
 	}
-	
+
+	/*
+	 * GUI Updating
+	 */
+
+	public static void reopenDungeonGUI(DungeonManager dungeon) {
+		Map<HumanEntity, Integer> pages = new HashMap<>();
+		for(DungeonGUI gui : dungeonGUIs.get(dungeon)) {
+			for(HumanEntity viewer : gui.getInventory().getViewers()) {
+				pages.put(viewer, gui.getCurrentPage());
+			}
+			gui.closeInventory();
+		}
+		for(Map.Entry<HumanEntity, Integer> entry : pages.entrySet()) {
+			DungeonGUI gui = openDungeonGUI(dungeon, entry.getKey());
+			gui.goToPage(entry.getValue());
+		}
+	}
+
+	public static void updateDungeonRoomCountSettings(DungeonManager dungeon) {
+		if(!dungeonGUIs.containsKey(dungeon)) return;
+		dungeonGUIs.get(dungeon).forEach(DungeonGUI::updateRoomCount);
+	}
+
+	public static void updateDungeonRoomRecyclingSettings(DungeonManager dungeon) {
+		if(!dungeonGUIs.containsKey(dungeon)) return;
+		dungeonGUIs.get(dungeon).forEach(DungeonGUI::updateRoomRecycling);
+	}
+
+	/*
+	 * GUI Memory Management
+	 */
+	private static void addDungeonGUI(DungeonManager dungeon, DungeonGUI gui) {
+		if(!dungeonGUIs.containsKey(dungeon)) {
+			dungeonGUIs.put(dungeon, new ArrayList<>(List.of(gui)));
+		} else {
+			dungeonGUIs.get(dungeon).add(gui);
+		}
+	}
+
+	private static void removeDungeonGUI(DungeonManager dungeon, DungeonGUI gui) {
+		if(dungeonGUIs.containsKey(dungeon)) {
+			List<DungeonGUI> list = dungeonGUIs.get(dungeon);
+			if(list.contains(gui)) list.remove(gui);
+			if(list.isEmpty()) dungeonGUIs.remove(dungeon);
+		}
+	}
+
+	private static void removeRoomGUI(Room room) {
+		if(roomGUIs.containsKey(room)) roomGUIs.remove(room);
+	}
+
+	private static void removeRoomDeleteGUI(Room room) {
+		if(roomDeleteGUIs.containsKey(room)) roomDeleteGUIs.remove(room);
+	}
+
+	public static void removeGUI(GUI gui) {
+		if(gui instanceof DungeonGUI dungeonGUI) {
+			removeDungeonGUI(dungeonGUI.getDungeon(), dungeonGUI);
+		} else if(gui instanceof RoomGUI roomGUI) {
+			removeRoomGUI(roomGUI.getRoom());
+		} else if(gui instanceof RoomDeleteGUI roomDeleteGUI) {
+			removeRoomDeleteGUI(roomDeleteGUI.getRoom());
+		}
+	}
 }

@@ -10,9 +10,12 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
+import fr.foxelia.proceduraldungeon.gui.GUIManager;
+import fr.foxelia.proceduraldungeon.utilities.*;
+import fr.foxelia.tools.minecraft.ui.color.ColoredConsole;
+import fr.foxelia.tools.minecraft.ui.gui.GUI;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.HumanEntity;
@@ -21,12 +24,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.foxelia.proceduraldungeon.commands.DungeonCommand;
 import fr.foxelia.proceduraldungeon.commands.DungeonCommandCompleter;
-import fr.foxelia.proceduraldungeon.gui.GUI;
 import fr.foxelia.proceduraldungeon.gui.GUIListeners;
-import fr.foxelia.proceduraldungeon.utilities.ActionType;
-import fr.foxelia.proceduraldungeon.utilities.BStats;
-import fr.foxelia.proceduraldungeon.utilities.DungeonManager;
-import fr.foxelia.proceduraldungeon.utilities.Pair;
 import net.md_5.bungee.api.ChatColor;
 
 public class Main extends JavaPlugin {
@@ -37,7 +35,6 @@ public class Main extends JavaPlugin {
 	private static Map<CommandSender, Pair<ActionType, String>> confirmation = new HashMap<>();
 	private static Map<HumanEntity, DungeonManager> renaming = new HashMap<>();
 	private static Map<Player, Location> exitLocation = new HashMap<>();
-	private static List<GUI> guis = new CopyOnWriteArrayList<GUI>();
 	
 	@Override
 	public void onEnable() {
@@ -45,25 +42,22 @@ public class Main extends JavaPlugin {
 		/*
 		 * Init message
 		 */
-		
-		getLogger().log(Level.INFO, ChatColor.DARK_GREEN + "======");
-		getLogger().log(Level.INFO, ChatColor.DARK_GREEN + getDescription().getName());
-		getLogger().log(Level.INFO, ChatColor.DARK_GREEN + "Initializing...");
+
+		getLogger().log(Level.INFO, ColoredConsole.DARK_GREEN + "======" + ColoredConsole.RESET);
+		getLogger().log(Level.INFO, ColoredConsole.DARK_GREEN + getDescription().getName() + ColoredConsole.RESET);
+		getLogger().log(Level.INFO, ColoredConsole.DARK_GREEN + "Initializing..." + ColoredConsole.RESET);
 		getLogger().log(Level.INFO, "");
-		getLogger().log(Level.INFO, ChatColor.DARK_GREEN + "Version " + getDescription().getVersion());
-//		getLogger().log(Level.INFO, ChatColor.RED + "/!\\ Attention Pré-release /!\\");
-//		getLogger().log(Level.INFO, ChatColor.RED + "/!\\ Attention ReleaseCandidate /!\\");
-//		getLogger().log(Level.INFO, ChatColor.RED + "Ce build n'est pas terminée");
-//		getLogger().log(Level.INFO, ChatColor.RED + "Il peut donc contenir des bugs");
+		getLogger().log(Level.INFO, ColoredConsole.DARK_GREEN + "Version " + getDescription().getVersion() + ColoredConsole.RESET);
 		getLogger().log(Level.INFO, "");
-		getLogger().log(Level.INFO, ChatColor.GOLD + "Designed for Foxelia Server");
-		getLogger().log(Level.INFO, ChatColor.YELLOW + "By " + getDescription().getAuthors().toString().replace("[", "").replace("]", ""));
-		getLogger().log(Level.INFO, ChatColor.DARK_GREEN + "======");
+		getLogger().log(Level.INFO, ColoredConsole.GOLD + "Designed for the Foxelia organization" + ColoredConsole.RESET);
+		getLogger().log(Level.INFO, ColoredConsole.YELLOW + "By " + getDescription().getAuthors().toString().replace("[", "").replace("]", "") + ColoredConsole.RESET);
+		getLogger().log(Level.INFO, ColoredConsole.DARK_GREEN + "======" + ColoredConsole.RESET);
 		
 		/*
 		 * Load Config
 		 */
 		saveDefaultConfig();
+		GUI.init(this);
 		
 		/*
 		 * Register Class (Listeners, Command & Code)
@@ -92,13 +86,13 @@ public class Main extends JavaPlugin {
 	
 	@Override
 	public void onDisable() {
-		
+		getDungeons().values().forEach(dungeon -> GUIManager.closeAllGUIOf(dungeon));
 	}
 	
 	private void restoreDungeons() {
 		File memoryFile = new File(Main.getProceduralDungeon().getDataFolder(), "dungeonslist.memory");
 		if(!memoryFile.exists()) return;
-		getLogger().log(Level.INFO, ChatColor.GREEN + "Restoring the dungeons sessions...");
+		getLogger().log(Level.INFO, ColoredConsole.GREEN + "Restoring the dungeons sessions..." + ColoredConsole.RESET);
 		Long delay = System.currentTimeMillis();
 
 		try {
@@ -123,7 +117,7 @@ public class Main extends JavaPlugin {
 			e.printStackTrace();
 		}
 		Main.saveDungeons();
-		getLogger().log(Level.INFO, ChatColor.GREEN + "Dungeons restored! Took " + String.valueOf(System.currentTimeMillis() - delay) + "ms.");
+		getLogger().log(Level.INFO, ColoredConsole.GREEN + "Dungeons restored! Took " + ColoredConsole.YELLOW + (System.currentTimeMillis() - delay) + "ms" + ColoredConsole.GREEN + "." + ColoredConsole.RESET);
 	}
 	
 	/*
@@ -183,10 +177,6 @@ public class Main extends JavaPlugin {
 	
 	public static Map<Player, Location> getExitLocation() {
 		return exitLocation;
-	}
-	
-	public static List<GUI> getGUIs() {
-		return guis;
 	}
 	
 	/*

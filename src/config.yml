@@ -1,6 +1,7 @@
 messages:
   errors:
-    alreadyexist: '&c[Error] The dungeon %dungeon% already exist!' 
+    alreadyexist: '&c[Error] The dungeon %dungeon% already exist!'
+    alreadyrenaming: '&c[Error] Another renaming is already in progress! Please wait for the end of the previous renaming.'
     doesnotexist: '&c[Error] The dungeon %dungeon% doesn’t exist!'
     roomnotexist: '&c[Error] The dungeon room #%room% doesn’t exist!'
     duplicatename: '&c[Error] Unable to load folder &4%folder%&c, another dungeon with this name is already in use. This dungeon is no longer loaded. You can re-import it with the command &4/dungeon create %folder%&c.'
@@ -37,6 +38,8 @@ messages:
     deletedungeon: '&cWarning, this command is intended to permanently delete the &4%dungeon%&c dungeon, this action cannot be undone. Please confirm your operation with the command &4/dungeon confirm&c.'
     importdungeon: '&aA record of this dungeon appears to already exist. Would you want try to import it? Please confirm your operation with the command &b/dungeon confirm&a.'
     renaming: '&aRenaming: Enter the new dungeon name. You will have 10 seconds to enter the new name.'
+    roomdeleted: '&cThe room you were editing has been deleted by another user. You have been redirected to the main menu.'
+    dungeondeleted: '&aThe dungeon you were editing has been deleted by another user. Editing has been canceled.'
     reload: '&aDungeons configs and messages reloaded!'
     listtop: '&8------ &7[&bDungeons List&7] &8------'
     listcontent: '&8- &b%dungeon% &8- &7%status%'
@@ -59,102 +62,3 @@ messages:
       generate: 'Generates the specified dungeon depending on these properties'
       list: 'Lists all created dungeons'
       help: 'Display this help page'
-gui:
-  dungeongui:
-    title: '&aEditing &8- &e%dungeon%'
-    boolean:
-      true: '&atrue'
-      false: '&cfalse'
-#
-# To use material, see the SpigotAPI material section
-# https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
-#
-    items:
-      rename:
-        name: '&aRename the dungeon'
-        lore:
-        - '&bChange the name of the dungeon'
-        - ''
-        - '&7Left click to rename the dungeon'
-        material: PAPER
-      roomcount:
-        name: '&aRoom count'
-        lore:
-        - '&bNumber of rooms to be generated'
-        - ''
-        - '&7Left click to &aincrease'
-        - '&7Right click to &cdecrease'
-        material: OAK_DOOR
-      roomrecyling:
-        name: '&aRoom recyling: %boolean%'
-        lore:
-        - '&bAllow/block re-using a room(s)'
-        - ''
-        - '&7Left click to toggle'
-        truematerial: LIME_WOOL
-        falsematerial: RED_WOOL
-      roomseparator:
-        name: '&r'
-        lore: null
-        material: BLACK_STAINED_GLASS_PANE
-      roomitem:
-        name: '&aRoom &e%int%'
-        lore:
-        - '&bEdit room properties'
-        - ''
-        - '&7Left click to enter the setup menu'
-        material: PISTON
-  roomgui:
-    title: '&aEditing &8- &e%room%'
-    items:
-      roomitem:
-        name: '&aRoom &e%int%'
-        lore:
-        - '&bEditing room properties'
-        - ''
-        - '&7Left click to go back'
-        material: PISTON
-      spawnrate:
-        name: '&aGeneration rate &e%int%%'
-        lore:
-        - '&bThe generation rate of the room'
-        material: DISPENSER
-      addspawnrate:
-        name: '&a+ &e%int%%'
-        lore:
-        - '&bIncreases the generation rate'
-        - ''
-        - '&7Left click to &aincrease'
-        material: LIME_STAINED_GLASS_PANE
-      lowerspawnrate:
-        name: '&c- &6%int%%'
-        lore:
-        - '&bDecreases the generation rate'
-        - ''
-        - '&7Left click to &cdecrease'
-        material: RED_STAINED_GLASS_PANE
-      delete:
-        name: '&cDelete the room'
-        lore:
-        - '&bDeletes the room’s corresponding files'
-        - '&cWarning! This action is permanent and &oirreversible'
-        - ''
-        - '&7Left click to &cdelete'
-        material: BARRIER
-  deletegui:
-    title: '&cAre you sure to delete &4%room%&c?'
-    items:
-      confirm:
-        name: '&aYes!'
-        lore:
-        - '&bThis action will permanently destroy this room.'
-        - ''
-        - '&7Left click to &aConfirm'
-        material: LIME_STAINED_GLASS_PANE
-      cancel:
-        name: '&cNo.'
-        lore:
-        - '&bKeep the room and do not delete anything'
-        - ''
-        - '&7Left click to &cCancel'
-        material: RED_STAINED_GLASS_PANE
