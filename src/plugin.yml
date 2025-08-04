@@ -1,5 +1,5 @@
 name: ProceduralDungeon
-version: 1.1.0
+version: 1.1.1
 description: Generate some dungeon with random rooms
 authors: [Foxelia, Zarinoow]
 main: fr.foxelia.proceduraldungeon.Main

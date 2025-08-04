@@ -75,6 +75,7 @@ public class WorldEditSchematic {
 			e.printStackTrace();
 		}
 		killAllItems(loc);
+		updateClientView(loc);
 	}
 	
 	public void saveSchematic(Location origin, LocalSession ps, File exportFile) {		
@@ -158,5 +159,24 @@ public class WorldEditSchematic {
 			return null;
 		}
 	}
-	
+
+	public void updateClientView(Location loc) {
+		Region updatedRegion = getFutureSelection(loc);
+		if (updatedRegion == null) return;
+
+		org.bukkit.World bukkitWorld = loc.getWorld();
+
+		int minChunkX = updatedRegion.getMinimumPoint().getBlockX() >> 4;
+		int maxChunkX = updatedRegion.getMaximumPoint().getBlockX() >> 4;
+		int minChunkZ = updatedRegion.getMinimumPoint().getBlockZ() >> 4;
+		int maxChunkZ = updatedRegion.getMaximumPoint().getBlockZ() >> 4;
+
+		for (int chunkX = minChunkX; chunkX <= maxChunkX; chunkX++) {
+			for (int chunkZ = minChunkZ; chunkZ <= maxChunkZ; chunkZ++) {
+				bukkitWorld.refreshChunk(chunkX, chunkZ);
+			}
+		}
+	}
+
+
 }
